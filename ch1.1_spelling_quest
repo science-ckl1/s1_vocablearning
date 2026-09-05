@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science Spell Quest - Interactive Spelling Game</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body {
+            font-family: 'Fredoka', 'Outfit', sans-serif;
+            background-color: #0b0f19;
+            color: #f3f4f6;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        .font-outfit {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        /* Glow effects */
+        .glow-cyan {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+        }
+        .glow-purple {
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+        }
+        .glow-green {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+        .text-glow {
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+        }
+
+        /* Tile Animations */
+        .tile-btn {
+            transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .tile-btn:active {
+            transform: scale(0.92);
+        }
+
+        @keyframes pulse-subtle {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .animate-pulse-subtle {
+            animation: pulse-subtle 2s infinite ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Glassmorphism */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col justify-between relative text-gray-100">
+
+    <!-- Background Canvas for Interactive Science Particles -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Top Navigation / Stats Header -->
+    <header class="relative z-10 w-full px-4 py-3 glass-panel border-b border-slate-800">
+        <div class="max-w-5xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="showScreen('menuScreen')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-lg shadow-cyan-500/30">
+                    <i class="fa-solid font-bold fa-flask-vial text-xl animate-float"></i>
+                </div>
+                <div>
+                    <h1 class="font-outfit font-extrabold text-xl tracking-wide bg-gradient-to-r from-cyan-400 via-sky-300 to-indigo-400 bg-clip-text text-transparent">
+                        SPELL LAB
+                    </h1>
+                    <p class="text-xs text-slate-400 font-medium">Science Vocabulary Edition</p>
+                </div>
+            </div>
+
+            <!-- Global Player Score & XP Bar -->
+            <div class="flex items-center space-x-4">
+                <div class="hidden sm:flex items-center bg-slate-900/80 px-3 py-1.5 rounded-full border border-slate-700/60">
+                    <i class="fa-solid fa-star text-amber-400 mr-2 text-sm"></i>
+                    <span id="globalStars" class="text-sm font-bold text-amber-300">0</span>
+                    <span class="text-xs text-slate-500 mx-1.5">|</span>
+                    <i class="fa-solid fa-bolt text-cyan-400 mr-1.5 text-sm"></i>
+                    <span id="globalXP" class="text-sm font-bold text-cyan-300">0 XP</span>
+                </div>
+
+                <!-- Audio Sound FX & Speech Toggle -->
+                <button id="soundToggleBtn" onclick="toggleSound()" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-slate-300 transition-all hover:text-white" title="Toggle Sound">
+                    <i id="soundIcon" class="fa-solid fa-volume-high"></i>
+                </button>
+
+                <button onclick="showScreen('badgeScreen')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 flex items-center justify-center text-amber-400 hover:text-amber-300 transition-all" title="View Badges">
+                    <i class="fa-solid fa-trophy"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="relative z-10 flex-grow flex items-center justify-center p-4">
+        <div class="w-full max-w-4xl">
+
+            <!-- ================= MAIN MENU SCREEN ================= -->
+            <div id="menuScreen" class="space-y-6 text-center py-4">
+                <div class="space-y-3">
+                    <span class="inline-block px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold uppercase tracking-wider">
+                        Master Your Science Spelling
+                    </span>
+                    <h2 class="text-4xl sm:text-5xl font-outfit font-extrabold text-white text-glow">
+                        Ready to Become a <span class="bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">Spell Scientist?</span>
+                    </h2>
+                    <p class="text-slate-300 max-w-xl mx-auto text-sm sm:text-base">
+                        Test your memory, unscramble complex words, and blast spelling targets to master key scientific vocabulary!
+                    </p>
+                </div>
+
+                <!-- Vocabulary Quick Stats Overview -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 max-w-2xl mx-auto pt-2">
+                    <div class="glass-panel p-3 rounded-2xl text-center">
+                        <i class="fa-solid fa-book-bookmark text-cyan-400 text-lg mb-1"></i>
+                        <p class="text-xs text-slate-400">Target Words</p>
+                        <p id="totalTermsText" class="text-lg font-bold text-white">10 Terms</p>
+                    </div>
+                    <div class="glass-panel p-3 rounded-2xl text-center">
+                        <i class="fa-solid fa-award text-amber-400 text-lg mb-1"></i>
+                        <p class="text-xs text-slate-400">Mastery Level</p>
+                        <p id="masteryPercent" class="text-lg font-bold text-white">0%</p>
+                    </div>
+                    <div class="glass-panel p-3 rounded-2xl text-center">
+                        <i class="fa-solid fa-fire text-orange-400 text-lg mb-1"></i>
+                        <p class="text-xs text-slate-400">Best Streak</p>
+                        <p id="bestStreakText" class="text-lg font-bold text-white">0</p>
+                    </div>
+                    <div class="glass-panel p-3 rounded-2xl text-center">
+                        <i class="fa-solid fa-medal text-purple-400 text-lg mb-1"></i>
+                        <p class="text-xs text-slate-400">Badges</p>
+                        <p id="badgeCountText" class="text-lg font-bold text-white">0 / 5</p>
+                    </div>
+                </div>
+
+                <!-- Game Mode Selection Cards -->
+                <div class="grid sm:grid-cols-3 gap-4 pt-4 text-left">
+                    
+                    <!-- Mode 1: Lab Scramble -->
+                    <div onclick="startScrambleMode()" class="glass-panel p-5 rounded-2xl cursor-pointer hover:border-cyan-500/60 hover:bg-slate-800/80 transition-all duration-300 transform hover:-translate-y-1 group flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-vial-circle-check"></i>
+                            </div>
+                            <h3 class="font-outfit font-bold text-lg text-white group-hover:text-cyan-300 transition-colors">
+                                Lab Scramble
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                                Unscramble chemical element letter bubbles to construct the correct scientific terms.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between text-xs text-cyan-400 font-semibold">
+                            <span>Play Scramble</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 2: Target Blast -->
+                    <div onclick="startMeteorMode()" class="glass-panel p-5 rounded-2xl cursor-pointer hover:border-purple-500/60 hover:bg-slate-800/80 transition-all duration-300 transform hover:-translate-y-1 group flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-crosshair"></i>
+                            </div>
+                            <h3 class="font-outfit font-bold text-lg text-white group-hover:text-purple-300 transition-colors">
+                                Laser Target Blast
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                                Fill in missing letters as word targets float downwards before they crash into the lab shield!
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between text-xs text-purple-400 font-semibold">
+                            <span>Play Arcade</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                    <!-- Mode 3: Audio Drill -->
+                    <div onclick="startDrillMode()" class="glass-panel p-5 rounded-2xl cursor-pointer hover:border-emerald-500/60 hover:bg-slate-800/80 transition-all duration-300 transform hover:-translate-y-1 group flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-2xl mb-4 group-hover:scale-110 transition-transform">
+                                <i class="fa-solid fa-headphones"></i>
+                            </div>
+                            <h3 class="font-outfit font-bold text-lg text-white group-hover:text-emerald-300 transition-colors">
+                                Audio Lab Exam
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-2 leading-relaxed">
+                                Listen to voice pronunciation and clue hints, then spell the term accurately against time.
+                            </p>
+                        </div>
+                        <div class="mt-6 flex items-center justify-between text-xs text-emerald-400 font-semibold">
+                            <span>Start Exam</span>
+                            <i class="fa-solid fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Vocabulary Study Hub Button -->
+                <div class="pt-2">
+                    <button onclick="showScreen('studyScreen')" class="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-gradient-to-r from-slate-800 to-slate-900 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-bold text-sm transition-all shadow-lg flex items-center justify-center mx-auto space-x-2">
+                        <i class="fa-solid fa-atom text-cyan-400 text-lg"></i>
+                        <span>Explore Vocabulary Flashcard Deck</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ================= VOCABULARY STUDY DECK ================= -->
+            <div id="studyScreen" class="hidden space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-outfit font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-book-open text-cyan-400"></i>
+                            Science Vocabulary Deck
+                        </h2>
+                        <p class="text-xs text-slate-400">Click any word card to hear audio pronunciation, phonetic guide, and scientific definition.</p>
+                    </div>
+                    <button onclick="showScreen('menuScreen')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-slate-700 transition">
+                        <i class="fa-solid fa-house mr-1.5"></i> Menu
+                    </button>
+                </div>
+
+                <!-- Word Grid -->
+                <div id="vocabGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Dynamic rendering via JS -->
+                </div>
+            </div>
+
+            <!-- ================= MODE 1: LAB SCRAMBLE GAME ================= -->
+            <div id="scrambleScreen" class="hidden space-y-6">
+                <!-- Top Progress Bar -->
+                <div class="flex items-center justify-between glass-panel px-4 py-3 rounded-2xl">
+                    <button onclick="exitToMenu()" class="text-xs font-semibold text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Exit
+                    </button>
+                    
+                    <div class="flex items-center space-x-6">
+                        <div class="text-center">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider">Word</p>
+                            <p id="scrambleProgressText" class="text-sm font-bold text-cyan-400">1 / 10</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider">Score</p>
+                            <p id="scrambleScoreText" class="text-sm font-bold text-amber-400">0</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider">Streak</p>
+                            <p id="scrambleStreakText" class="text-sm font-bold text-purple-400">0🔥</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Game Card -->
+                <div class="glass-panel p-6 sm:p-8 rounded-3xl text-center space-y-6 relative overflow-hidden">
+                    
+                    <!-- Audio & Definition Clue -->
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-center space-x-2">
+                            <button onclick="playCurrentWordAudio()" class="px-3.5 py-1.5 rounded-full bg-cyan-500/20 hover:bg-cyan-500/30 border border-cyan-500/40 text-cyan-300 text-xs font-semibold flex items-center space-x-2 transition">
+                                <i class="fa-solid fa-volume-high text-cyan-400"></i>
+                                <span>Listen Pronunciation</span>
+                            </button>
+                            <button onclick="useScrambleHint()" id="hintBtn" class="px-3.5 py-1.5 rounded-full bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 text-xs font-semibold flex items-center space-x-1.5 transition">
+                                <i class="fa-solid fa-lightbulb"></i>
+                                <span>Hint (-10 pts)</span>
+                            </button>
+                        </div>
+
+                        <p id="scrambleDefinition" class="text-slate-300 text-sm max-w-lg mx-auto bg-slate-900/60 p-3 rounded-xl border border-slate-800 italic">
+                            <!-- Clue goes here -->
+                        </p>
+                    </div>
+
+                    <!-- Target Word Slots (Assembled word) -->
+                    <div class="flex flex-col items-center space-y-2">
+                        <p class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Assemble Word</p>
+                        <div id="targetSlots" class="flex flex-wrap items-center justify-center gap-2 min-h-[60px] p-2">
+                            <!-- Target tiles will appear here -->
+                        </div>
+                    </div>
+
+                    <!-- Scrambled Available Letters Pool -->
+                    <div class="space-y-2 pt-2 border-t border-slate-800/80">
+                        <p class="text-xs text-slate-400">Click letters in order or use physical keyboard</p>
+                        <div id="scrambledLettersPool" class="flex flex-wrap items-center justify-center gap-2 max-w-xl mx-auto min-h-[60px]">
+                            <!-- Available scrambled letter buttons -->
+                        </div>
+                    </div>
+
+                    <!-- Control Action Buttons -->
+                    <div class="flex items-center justify-center space-x-3 pt-2">
+                        <button onclick="resetScrambleAnswer()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition">
+                            <i class="fa-solid fa-rotate-left mr-1"></i> Clear
+                        </button>
+                        <button onclick="checkScrambleAnswer()" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-sm font-bold shadow-lg shadow-cyan-500/25 transition transform active:scale-95">
+                            Submit Answer <i class="fa-solid fa-check ml-1.5"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= MODE 2: LASER TARGET BLAST ================= -->
+            <div id="meteorScreen" class="hidden space-y-6">
+                <!-- Arcade Header -->
+                <div class="flex items-center justify-between glass-panel px-4 py-3 rounded-2xl">
+                    <button onclick="exitToMenu()" class="text-xs font-semibold text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Exit
+                    </button>
+                    <div class="flex items-center space-x-6">
+                        <div class="text-center">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider">Score</p>
+                            <p id="meteorScoreText" class="text-sm font-bold text-purple-400">0</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider">Lab Shield</p>
+                            <div class="flex items-center space-x-1" id="meteorLivesContainer">
+                                <i class="fa-solid fa-shield text-cyan-400 text-sm"></i>
+                                <i class="fa-solid fa-shield text-cyan-400 text-sm"></i>
+                                <i class="fa-solid fa-shield text-cyan-400 text-sm"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Laser Target Playfield Canvas Box -->
+                <div class="glass-panel rounded-3xl p-6 sm:p-8 relative min-h-[360px] flex flex-col justify-between items-center overflow-hidden border border-purple-500/20">
+                    
+                    <!-- Floating Target Word Element -->
+                    <div id="meteorTargetBox" class="w-full max-w-md bg-slate-900/90 border-2 border-purple-500/60 p-5 rounded-2xl text-center space-y-3 transition-all duration-300 shadow-xl shadow-purple-500/10">
+                        <span class="inline-block px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-bold uppercase tracking-wider">
+                            Identify Missing Letter
+                        </span>
+                        
+                        <div id="meteorWordDisplay" class="text-3xl sm:text-4xl font-outfit font-extrabold text-white tracking-widest my-2">
+                            <!-- e.g. B _ o l o g y -->
+                        </div>
+
+                        <p id="meteorClueText" class="text-xs text-slate-300 italic max-w-xs mx-auto">
+                            <!-- Definition clue -->
+                        </p>
+                    </div>
+
+                    <!-- Keyboard Option Keypad -->
+                    <div class="w-full max-w-xl space-y-3 mt-6">
+                        <p class="text-center text-xs text-slate-400 font-semibold">Select or type the correct letter to blast target:</p>
+                        <div id="meteorKeyOptions" class="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                            <!-- Dynamic Key Choice buttons -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= MODE 3: AUDIO LAB EXAM ================= -->
+            <div id="drillScreen" class="hidden space-y-6">
+                <!-- Exam Header -->
+                <div class="flex items-center justify-between glass-panel px-4 py-3 rounded-2xl">
+                    <button onclick="exitToMenu()" class="text-xs font-semibold text-slate-400 hover:text-white">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Exit
+                    </button>
+                    <div class="flex items-center space-x-6">
+                        <div class="text-center">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider">Word</p>
+                            <p id="drillProgressText" class="text-sm font-bold text-emerald-400">1 / 10</p>
+                        </div>
+                        <div class="text-center">
+                            <p class="text-[10px] text-slate-400 uppercase tracking-wider">Score</p>
+                            <p id="drillScoreText" class="text-sm font-bold text-amber-400">0</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exam Card -->
+                <div class="glass-panel p-6 sm:p-10 rounded-3xl text-center space-y-6">
+                    
+                    <div class="w-20 h-20 mx-auto rounded-full bg-emerald-500/20 border-2 border-emerald-500/50 flex items-center justify-center text-emerald-400 text-3xl shadow-lg shadow-emerald-500/20 cursor-pointer hover:scale-105 transition-transform" onclick="playCurrentWordAudio()">
+                        <i class="fa-solid fa-volume-high animate-pulse-subtle"></i>
+                    </div>
+
+                    <div>
+                        <p class="text-xs text-emerald-400 font-semibold uppercase tracking-wider mb-1">Click Speaker to Listen</p>
+                        <p id="drillClue" class="text-slate-300 text-sm max-w-md mx-auto bg-slate-900/60 p-3 rounded-xl border border-slate-800 italic">
+                            <!-- Clue -->
+                        </p>
+                    </div>
+
+                    <!-- Direct Text Box Input -->
+                    <div class="max-w-md mx-auto space-y-3">
+                        <input type="text" id="drillInput" placeholder="Type full spelling here..." autocomplete="off" spellcheck="false" class="w-full text-center text-xl sm:text-2xl font-outfit font-bold py-3.5 px-4 rounded-2xl bg-slate-900 border-2 border-slate-700 focus:border-emerald-500 focus:outline-none text-white tracking-widest placeholder:text-slate-600 placeholder:text-base transition">
+                        
+                        <div class="flex space-x-2">
+                            <button onclick="playCurrentWordAudio()" class="w-1/3 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold border border-slate-700 transition">
+                                <i class="fa-solid fa-repeat mr-1"></i> Repeat Word
+                            </button>
+                            <button onclick="submitDrillAnswer()" class="w-2/3 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white text-sm font-bold shadow-lg shadow-emerald-500/20 transition transform active:scale-95">
+                                Submit Spelling <i class="fa-solid fa-paper-plane ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- ================= BADGES & ACHIEVEMENTS SCREEN ================= -->
+            <div id="badgeScreen" class="hidden space-y-6">
+                <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div>
+                        <h2 class="text-2xl font-outfit font-extrabold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-trophy text-amber-400"></i>
+                            Science Lab Trophies & Badges
+                        </h2>
+                        <p class="text-xs text-slate-400">Complete spelling challenges across all modes to unlock lab honors!</p>
+                    </div>
+                    <button onclick="showScreen('menuScreen')" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-semibold text-slate-300 border border-slate-700 transition">
+                        <i class="fa-solid fa-house mr-1.5"></i> Menu
+                    </button>
+                </div>
+
+                <div id="badgeGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Badges render here -->
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 py-3 text-center text-xs text-slate-500 glass-panel border-t border-slate-800 mt-auto">
+        <p>Science Spell Quest &bull; Interactive Vocabulary Revision Tool</p>
+    </footer>
+
+    <!-- Result Feedback Modal -->
+    <div id="resultModal" class="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 hidden">
+        <div class="glass-panel border-2 border-cyan-500/40 p-6 sm:p-8 rounded-3xl max-w-md w-full text-center space-y-5 animate-float shadow-2xl">
+            <div id="modalIconContainer" class="w-16 h-16 mx-auto rounded-full bg-cyan-500/20 border border-cyan-500/40 flex items-center justify-center text-3xl text-cyan-400">
+                <i class="fa-solid fa-flask text-3xl"></i>
+            </div>
+
+            <div>
+                <h3 id="modalTitle" class="text-2xl font-outfit font-extrabold text-white">Lab Experiment Complete!</h3>
+                <p id="modalSubtitle" class="text-xs text-slate-400 mt-1">Here is how you performed on your vocabulary quiz</p>
+            </div>
+
+            <!-- Star Rating Display -->
+            <div class="flex justify-center space-x-2 text-2xl text-amber-400" id="modalStars">
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+                <i class="fa-solid fa-star"></i>
+            </div>
+
+            <!-- Stats Box -->
+            <div class="bg-slate-900/80 rounded-2xl p-4 border border-slate-800 grid grid-cols-2 gap-3 text-left">
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase">Final Score</p>
+                    <p id="modalScore" class="text-lg font-bold text-white">0 Pts</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase">XP Earned</p>
+                    <p id="modalXP" class="text-lg font-bold text-cyan-400">+0 XP</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase">Accuracy</p>
+                    <p id="modalAccuracy" class="text-lg font-bold text-emerald-400">100%</p>
+                </div>
+                <div>
+                    <p class="text-[10px] text-slate-400 uppercase">Word Mastery</p>
+                    <p id="modalWords" class="text-lg font-bold text-purple-400">10 / 10</p>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex space-x-3 pt-2">
+                <button onclick="closeModal(); showScreen('menuScreen');" class="w-1/2 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition">
+                    Main Menu
+                </button>
+                <button id="modalRetryBtn" onclick="retryCurrentMode()" class="w-1/2 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-cyan-500/20 transition">
+                    Play Again
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- GAME LOGIC JAVASCRIPT -->
+    <script>
+        // Vocabulary dataset specifically tailored for requested science words
+        const VOCABULARY = [
+            {
+                word: "Science",
+                phonetic: "/ˈsaɪ.əns/",
+                definition: "The systematic study of the structure and behavior of the physical and natural world through observation and experiment.",
+                clue: "We perform laboratory experiments to discover facts about the natural world through ______.",
+                fact: "The word originates from the Latin 'scientia', which means knowledge!"
+            },
+            {
+                word: "Biology",
+                phonetic: "/baɪˈɒl.ə.dʒi/",
+                definition: "The branch of science that studies living organisms and their vital processes.",
+                clue: "The study of cells, plants, animals, and human anatomy is called ______.",
+                fact: "'Bio' means life, and 'ology' means the study of!"
+            },
+            {
+                word: "Physics",
+                phonetic: "/ˈfɪz.ɪks/",
+                definition: "The branch of science concerned with the nature and properties of matter and energy.",
+                clue: "Gravity, motion, electricity, and magnetism are fundamental topics in ______.",
+                fact: "Sir Isaac Newton and Albert Einstein were pioneer scientists in this field!"
+            },
+            {
+                word: "Chemistry",
+                phonetic: "/ˈkɛm.ɪ.stri/",
+                definition: "The branch of science concerned with the substances of which matter is composed, their properties, and reactions.",
+                clue: "The study of atoms, molecules, periodic elements, and chemical reactions is called ______.",
+                fact: "Chemistry is often called the 'central science' because it connects physics with biology!"
+            },
+            {
+                word: "Evidence",
+                phonetic: "/ˈev.ɪ.dəns/",
+                definition: "The available body of facts or information indicating whether a belief or proposition is true.",
+                clue: "Scientists collect experimental data and observation results as ______ to prove a hypothesis.",
+                fact: "Without strong empirical evidence, a scientific theory cannot be accepted!"
+            },
+            {
+                word: "Limitation",
+                phonetic: "/ˌlɪm.ɪˈteɪ.ʃən/",
+                definition: "A condition, restriction, or shortcoming that affects the accuracy or scope of scientific measurements or equipment.",
+                clue: "Low resolution microscopes or small sample sizes are examples of experimental ______.",
+                fact: "Identifying limitations helps scientists design better future experiments!"
+            },
+            {
+                word: "Discovery",
+                phonetic: "/dɪˈskʌv.ər.i/",
+                definition: "The act of finding or learning something new for the very first time.",
+                clue: "Alexander Fleming's accidental finding of penicillin was a major medical ______.",
+                fact: "Many famous science discoveries happened unexpectedly during unrelated trials!"
+            },
+            {
+                word: "Invention",
+                phonetic: "/ɪnˈven.ʃən/",
+                definition: "A novel process, device, or article created through human ingenuity.",
+                clue: "The electric lightbulb, microscope, and telephone were each a groundbreaking human ______.",
+                fact: "An invention is a newly created device, whereas a discovery reveals something already existing!"
+            },
+            {
+                word: "Technology",
+                phonetic: "/tekˈnɒl.ə.dʒi/",
+                definition: "The application of scientific knowledge for practical purposes and problem solving.",
+                clue: "Computers, robotics, space probes, and medical imaging are all examples of modern ______.",
+                fact: "Technology applies theoretical science concepts into real-world tools!"
+            },
+            {
+                word: "Scientist",
+                phonetic: "/ˈsaɪ.ən.tɪst/",
+                definition: "A person who conducts scientific research to advance knowledge in an area of interest.",
+                clue: "A dedicated researcher who formulates hypotheses and performs lab experiments is a ______.",
+                fact: "The word 'scientist' was first coined by William Whewell in 1833!"
+            }
+        ];
+
+        // Web Audio Synthesizer for self-contained sound effects
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+            }
+
+            playTone(freq, type, duration, gainVal = 0.1) {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            }
+
+            click() { this.playTone(600, 'sine', 0.08, 0.08); }
+            correct() { 
+                this.playTone(523.25, 'triangle', 0.12, 0.12);
+                setTimeout(() => this.playTone(659.25, 'triangle', 0.12, 0.12), 80);
+                setTimeout(() => this.playTone(783.99, 'triangle', 0.25, 0.15), 160);
+            }
+            wrong() {
+                this.playTone(220, 'sawtooth', 0.15, 0.12);
+                setTimeout(() => this.playTone(180, 'sawtooth', 0.25, 0.12), 120);
+            }
+            laser() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(100, this.ctx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+                    gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + 0.15);
+                } catch(e) {}
+            }
+            victory() {
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    setTimeout(() => this.playTone(freq, 'sine', 0.3, 0.15), idx * 120);
+                });
+            }
+        }
+
+        const sfx = new SoundFX();
+
+        // Audio Speech Synthesis for pronunciation
+        function speakWord(text) {
+            if (!sfx.enabled) return;
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Clear queue
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.85;
+                utterance.pitch = 1.0;
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        // User State
+        let gameState = {
+            totalStars: parseInt(localStorage.getItem('spell_stars') || '0'),
+            totalXP: parseInt(localStorage.getItem('spell_xp') || '0'),
+            bestStreak: parseInt(localStorage.getItem('spell_streak') || '0'),
+            masteredWords: JSON.parse(localStorage.getItem('spell_mastered') || '[]'),
+            unlockedBadges: JSON.parse(localStorage.getItem('spell_badges') || '[]'),
+            
+            // Session specific
+            currentMode: null, // 'scramble', 'meteor', 'drill'
+            wordIndex: 0,
+            score: 0,
+            streak: 0,
+            lives: 3,
+            selectedLetters: [],
+            shuffledLetters: [],
+            scrambleHintUsed: false
+        };
+
+        const BADGES = [
+            { id: "first_win", name: "Junior Apprentice", desc: "Complete your first spelling game", icon: "fa-certificate", color: "text-blue-400" },
+            { id: "streak_5", name: "Streak Master", desc: "Reach a 5-word correct streak", icon: "fa-fire", color: "text-orange-400" },
+            { id: "vocab_deck", name: "Curious Scholar", desc: "Explore all words in the Vocab Deck", icon: "fa-book-open", color: "text-cyan-400" },
+            { id: "perfect_score", name: "Flawless Scientist", desc: "Complete a mode without making mistakes", icon: "fa-star-shooting", color: "text-amber-400" },
+            { id: "master_all", name: "Lab Legend", desc: `Master all ${VOCABULARY.length} science terms`, icon: "fa-crown", color: "text-purple-400" }
+        ];
+
+        // Canvas Background Animation
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.radius = Math.random() * 2 + 1;
+                this.color = ['rgba(6, 182, 212, ', 'rgba(168, 85, 247, ', 'rgba(59, 130, 246, '][Math.floor(Math.random()*3)];
+                this.alpha = Math.random() * 0.5 + 0.2;
+                this.vx = (Math.random() - 0.5) * 0.4;
+                this.vy = (Math.random() - 0.5) * 0.4;
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.y < 0) this.y = canvas.height;
+                if (this.y > canvas.height) this.y = 0;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color + this.alpha + ')';
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 45; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Screen Navigation
+        function showScreen(screenId) {
+            sfx.click();
+            ['menuScreen', 'studyScreen', 'scrambleScreen', 'meteorScreen', 'drillScreen', 'badgeScreen'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.add('hidden');
+            });
+            const target = document.getElementById(screenId);
+            if (target) target.classList.remove('hidden');
+
+            if (screenId === 'studyScreen') renderStudyDeck();
+            if (screenId === 'badgeScreen') renderBadges();
+            updateGlobalHeader();
+        }
+
+        function toggleSound() {
+            sfx.enabled = !sfx.enabled;
+            const icon = document.getElementById('soundIcon');
+            if (sfx.enabled) {
+                icon.className = "fa-solid fa-volume-high text-cyan-400";
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-slate-500";
+            }
+        }
+
+        function updateGlobalHeader() {
+            document.getElementById('globalStars').innerText = gameState.totalStars;
+            document.getElementById('globalXP').innerText = gameState.totalXP + " XP";
+            
+            // Update menu stats
+            const mastery = Math.round((gameState.masteredWords.length / VOCABULARY.length) * 100);
+            document.getElementById('totalTermsText').innerText = VOCABULARY.length + " Terms";
+            document.getElementById('masteryPercent').innerText = mastery + "%";
+            document.getElementById('bestStreakText').innerText = gameState.bestStreak + "🔥";
+            document.getElementById('badgeCountText').innerText = `${gameState.unlockedBadges.length} / ${BADGES.length}`;
+            
+            // Save localstorage
+            localStorage.setItem('spell_stars', gameState.totalStars);
+            localStorage.setItem('spell_xp', gameState.totalXP);
+            localStorage.setItem('spell_streak', gameState.bestStreak);
+            localStorage.setItem('spell_mastered', JSON.stringify(gameState.masteredWords));
+            localStorage.setItem('spell_badges', JSON.stringify(gameState.unlockedBadges));
+        }
+
+        // Render Study Deck
+        function renderStudyDeck() {
+            unlockBadge('vocab_deck');
+            const grid = document.getElementById('vocabGrid');
+            grid.innerHTML = VOCABULARY.map(item => {
+                const isMastered = gameState.masteredWords.includes(item.word);
+                return `
+                    <div class="glass-panel p-5 rounded-2xl hover:border-cyan-500/50 transition-all group flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-xs text-slate-400 font-mono">${item.phonetic}</span>
+                                <button onclick="speakWord('${item.word}')" class="w-8 h-8 rounded-full bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-300 flex items-center justify-center transition">
+                                    <i class="fa-solid fa-volume-high text-xs"></i>
+                                </button>
+                            </div>
+                            <h3 class="font-outfit font-extrabold text-xl text-white group-hover:text-cyan-300 transition-colors flex items-center gap-2">
+                                ${item.word}
+                                ${isMastered ? '<i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>' : ''}
+                            </h3>
+                            <p class="text-xs text-slate-300 mt-2 leading-relaxed">${item.definition}</p>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-slate-800 text-[11px] text-cyan-400/90 italic">
+                            <i class="fa-solid fa-lightbulb mr-1 text-amber-400"></i> ${item.fact}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ================= MODE 1: LAB SCRAMBLE LOGIC =================
+        function startScrambleMode() {
+            gameState.currentMode = 'scramble';
+            gameState.wordIndex = 0;
+            gameState.score = 0;
+            gameState.streak = 0;
+            showScreen('scrambleScreen');
+            loadScrambleWord();
+        }
+
+        function loadScrambleWord() {
+            if (gameState.wordIndex >= VOCABULARY.length) {
+                endGameRound();
+                return;
+            }
+
+            const currentObj = VOCABULARY[gameState.wordIndex];
+            const word = currentObj.word.toUpperCase();
+            gameState.selectedLetters = [];
+            gameState.scrambleHintUsed = false;
+
+            // Update Header Stats
+            document.getElementById('scrambleProgressText').innerText = `${gameState.wordIndex + 1} / ${VOCABULARY.length}`;
+            document.getElementById('scrambleScoreText').innerText = gameState.score;
+            document.getElementById('scrambleStreakText').innerText = `${gameState.streak}🔥`;
+            document.getElementById('scrambleDefinition').innerText = `"${currentObj.clue}"`;
+
+            // Speak word audio once on load
+            speakWord(currentObj.word);
+
+            // Shuffle letters
+            let letters = word.split('');
+            // Ensure shuffled version isn't identical to target word
+            do {
+                letters.sort(() => Math.random() - 0.5);
+            } while (letters.join('') === word && word.length > 2);
+
+            gameState.shuffledLetters = letters.map((char, id) => ({ id, char, used: false }));
+
+            renderScrambleTiles();
+        }
+
+        function renderScrambleTiles() {
+            const currentObj = VOCABULARY[gameState.wordIndex];
+            const targetLength = currentObj.word.length;
+
+            // Render Slots
+            const targetSlots = document.getElementById('targetSlots');
+            targetSlots.innerHTML = '';
+            
+            for (let i = 0; i < targetLength; i++) {
+                const filled = gameState.selectedLetters[i];
+                const slotBtn = document.createElement('button');
+                slotBtn.className = `w-11 h-12 sm:w-12 sm:h-14 rounded-xl border-2 font-outfit font-extrabold text-xl sm:text-2xl flex items-center justify-center transition-all ${
+                    filled 
+                    ? 'bg-cyan-500/20 border-cyan-400 text-cyan-200 shadow-md shadow-cyan-500/20' 
+                    : 'bg-slate-900/60 border-slate-700/80 text-slate-600'
+                }`;
+                slotBtn.innerText = filled ? filled.char : '';
+                if (filled) {
+                    slotBtn.onclick = () => removeSelectedLetter(i);
+                }
+                targetSlots.appendChild(slotBtn);
+            }
+
+            // Render Letter Pool
+            const pool = document.getElementById('scrambledLettersPool');
+            pool.innerHTML = '';
+
+            gameState.shuffledLetters.forEach(item => {
+                const letterBtn = document.createElement('button');
+                letterBtn.disabled = item.used;
+                letterBtn.className = `tile-btn w-11 h-12 sm:w-12 sm:h-14 rounded-xl font-outfit font-extrabold text-lg sm:text-xl border-2 transition-all ${
+                    item.used 
+                    ? 'opacity-20 bg-slate-900 border-slate-800 text-slate-600 cursor-not-allowed' 
+                    : 'bg-slate-800 hover:bg-slate-700 border-slate-600 hover:border-cyan-400 text-white shadow-lg'
+                }`;
+                letterBtn.innerText = item.char;
+                letterBtn.onclick = () => selectScrambleLetter(item);
+                pool.appendChild(letterBtn);
+            });
+        }
+
+        function selectScrambleLetter(item) {
+            if (item.used) return;
+            sfx.click();
+            item.used = true;
+            gameState.selectedLetters.push(item);
+            renderScrambleTiles();
+        }
+
+        function removeSelectedLetter(index) {
+            sfx.click();
+            const removed = gameState.selectedLetters.splice(index, 1)[0];
+            if (removed) {
+                const poolItem = gameState.shuffledLetters.find(x => x.id === removed.id);
+                if (poolItem) poolItem.used = false;
+            }
+            renderScrambleTiles();
+        }
+
+        function resetScrambleAnswer() {
+            sfx.click();
+            gameState.selectedLetters = [];
+            gameState.shuffledLetters.forEach(item => item.used = false);
+            renderScrambleTiles();
+        }
+
+        function useScrambleHint() {
+            if (gameState.scrambleHintUsed) return;
+            const targetWord = VOCABULARY[gameState.wordIndex].word.toUpperCase();
+            
+            // Find first missing or wrong letter
+            let targetIdx = gameState.selectedLetters.length;
+            if (targetIdx >= targetWord.length) return;
+
+            sfx.click();
+            gameState.score = Math.max(0, gameState.score - 10);
+            gameState.scrambleHintUsed = true;
+
+            const neededChar = targetWord[targetIdx];
+            const unusedItem = gameState.shuffledLetters.find(x => !x.used && x.char === neededChar);
+            if (unusedItem) {
+                selectScrambleLetter(unusedItem);
+            }
+        }
+
+        function playCurrentWordAudio() {
+            const currentObj = VOCABULARY[gameState.wordIndex];
+            if (currentObj) speakWord(currentObj.word);
+        }
+
+        function checkScrambleAnswer() {
+            const currentObj = VOCABULARY[gameState.wordIndex];
+            const targetWord = currentObj.word.toUpperCase();
+            const userAttempt = gameState.selectedLetters.map(x => x.char).join('');
+
+            if (userAttempt === targetWord) {
+                // Correct!
+                sfx.correct();
+                gameState.score += 100 + (gameState.streak * 20);
+                gameState.streak++;
+                if (gameState.streak > gameState.bestStreak) gameState.bestStreak = gameState.streak;
+
+                if (!gameState.masteredWords.includes(currentObj.word)) {
+                    gameState.masteredWords.push(currentObj.word);
+                }
+
+                if (gameState.streak >= 5) unlockBadge('streak_5');
+
+                gameState.wordIndex++;
+                loadScrambleWord();
+            } else {
+                // Wrong
+                sfx.wrong();
+                gameState.streak = 0;
+                const slotContainer = document.getElementById('targetSlots');
+                slotContainer.classList.add('animate-shake');
+                setTimeout(() => slotContainer.classList.remove('animate-shake'), 400);
+            }
+        }
+
+        // ================= MODE 2: LASER TARGET BLAST LOGIC =================
+        let meteorInterval = null;
+
+        function startMeteorMode() {
+            gameState.currentMode = 'meteor';
+            gameState.wordIndex = 0;
+            gameState.score = 0;
+            gameState.lives = 3;
+            gameState.streak = 0;
+            showScreen('meteorScreen');
+            loadMeteorTarget();
+        }
+
+        function loadMeteorTarget() {
+            if (gameState.wordIndex >= VOCABULARY.length || gameState.lives <= 0) {
+                endGameRound();
+                return;
+            }
+
+            const currentObj = VOCABULARY[gameState.wordIndex];
+            const word = currentObj.word.toUpperCase();
+            
+            // Choose a missing letter index
+            const missingIdx = Math.floor(Math.random() * word.length);
+            const missingChar = word[missingIdx];
+
+            // Render Word with blank underscore
+            let displayChars = word.split('');
+            displayChars[missingIdx] = '<span class="text-purple-400 border-b-4 border-purple-400 px-2 animate-pulse">_</span>';
+            
+            document.getElementById('meteorWordDisplay').innerHTML = displayChars.join(' ');
+            document.getElementById('meteorClueText').innerText = `"${currentObj.clue}"`;
+            document.getElementById('meteorScoreText').innerText = gameState.score;
+            
+            // Render Lives
+            const livesContainer = document.getElementById('meteorLivesContainer');
+            livesContainer.innerHTML = '';
+            for (let i = 0; i < 3; i++) {
+                const icon = document.createElement('i');
+                icon.className = `fa-solid fa-shield text-sm ${i < gameState.lives ? 'text-cyan-400' : 'text-slate-700'}`;
+                livesContainer.appendChild(icon);
+            }
+
+            // Speak audio hint
+            speakWord(currentObj.word);
+
+            // Generate Key Options (including correct letter + distractor options)
+            let options = [missingChar];
+            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            while (options.length < 6) {
+                const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)];
+                if (!options.includes(randomChar)) options.push(randomChar);
+            }
+            options.sort(() => Math.random() - 0.5);
+
+            const keyOptionsDiv = document.getElementById('meteorKeyOptions');
+            keyOptionsDiv.innerHTML = '';
+
+            options.forEach(char => {
+                const keyBtn = document.createElement('button');
+                keyBtn.className = "py-3 rounded-xl bg-slate-800 hover:bg-purple-600/80 border border-slate-700 font-outfit font-extrabold text-lg text-white transition active:scale-95 shadow-md";
+                keyBtn.innerText = char;
+                keyBtn.onclick = () => testMeteorKey(char, missingChar);
+                keyOptionsDiv.appendChild(keyBtn);
+            });
+        }
+
+        function testMeteorKey(selectedKey, correctKey) {
+            sfx.laser();
+            if (selectedKey === correctKey) {
+                sfx.correct();
+                gameState.score += 150;
+                gameState.streak++;
+                const currentObj = VOCABULARY[gameState.wordIndex];
+                if (!gameState.masteredWords.includes(currentObj.word)) {
+                    gameState.masteredWords.push(currentObj.word);
+                }
+                gameState.wordIndex++;
+                loadMeteorTarget();
+            } else {
+                sfx.wrong();
+                gameState.lives--;
+                gameState.streak = 0;
+                
+                const box = document.getElementById('meteorTargetBox');
+                box.classList.add('animate-shake');
+                setTimeout(() => box.classList.remove('animate-shake'), 400);
+
+                if (gameState.lives <= 0) {
+                    endGameRound();
+                } else {
+                    loadMeteorTarget();
+                }
+            }
+        }
+
+        // ================= MODE 3: AUDIO LAB EXAM LOGIC =================
+        function startDrillMode() {
+            gameState.currentMode = 'drill';
+            gameState.wordIndex = 0;
+            gameState.score = 0;
+            showScreen('drillScreen');
+            loadDrillWord();
+        }
+
+        function loadDrillWord() {
+            if (gameState.wordIndex >= VOCABULARY.length) {
+                endGameRound();
+                return;
+            }
+
+            const currentObj = VOCABULARY[gameState.wordIndex];
+            document.getElementById('drillProgressText').innerText = `${gameState.wordIndex + 1} / ${VOCABULARY.length}`;
+            document.getElementById('drillScoreText').innerText = gameState.score;
+            document.getElementById('drillClue').innerText = `"${currentObj.clue}"`;
+            
+            const input = document.getElementById('drillInput');
+            input.value = '';
+            input.focus();
+
+            speakWord(currentObj.word);
+        }
+
+        function submitDrillAnswer() {
+            const currentObj = VOCABULARY[gameState.wordIndex];
+            const targetWord = currentObj.word.toLowerCase().trim();
+            const inputVal = document.getElementById('drillInput').value.toLowerCase().trim();
+
+            if (inputVal === targetWord) {
+                sfx.correct();
+                gameState.score += 120;
+                if (!gameState.masteredWords.includes(currentObj.word)) {
+                    gameState.masteredWords.push(currentObj.word);
+                }
+                gameState.wordIndex++;
+                loadDrillWord();
+            } else {
+                sfx.wrong();
+                const input = document.getElementById('drillInput');
+                input.classList.add('animate-shake', 'border-red-500');
+                setTimeout(() => input.classList.remove('animate-shake', 'border-red-500'), 500);
+            }
+        }
+
+        // Global Physical Keyboard Listener
+        document.addEventListener('keydown', (e) => {
+            const key = e.key.toUpperCase();
+            
+            // Mode 1: Scramble key pressing
+            if (gameState.currentMode === 'scramble' && !document.getElementById('scrambleScreen').classList.contains('hidden')) {
+                if (key === 'ENTER') {
+                    checkScrambleAnswer();
+                } else if (key === 'BACKSPACE') {
+                    if (gameState.selectedLetters.length > 0) {
+                        removeSelectedLetter(gameState.selectedLetters.length - 1);
+                    }
+                } else if (/^[A-Z]$/.test(key)) {
+                    const unusedItem = gameState.shuffledLetters.find(x => !x.used && x.char === key);
+                    if (unusedItem) selectScrambleLetter(unusedItem);
+                }
+            }
+
+            // Mode 3: Drill Enter key
+            if (gameState.currentMode === 'drill' && !document.getElementById('drillScreen').classList.contains('hidden')) {
+                if (e.key === 'Enter') submitDrillAnswer();
+            }
+        });
+
+        // ================= GAME OVER / RESULTS SYSTEM =================
+        function endGameRound() {
+            sfx.victory();
+            unlockBadge('first_win');
+
+            if (gameState.masteredWords.length === VOCABULARY.length) {
+                unlockBadge('master_all');
+            }
+
+            const starsEarned = gameState.score > 800 ? 3 : (gameState.score > 400 ? 2 : 1);
+            const xpGained = Math.round(gameState.score * 1.5);
+
+            gameState.totalStars += starsEarned;
+            gameState.totalXP += xpGained;
+
+            updateGlobalHeader();
+
+            // Populate Modal
+            document.getElementById('modalScore').innerText = `${gameState.score} Pts`;
+            document.getElementById('modalXP').innerText = `+${xpGained} XP`;
+            document.getElementById('modalAccuracy').innerText = `${Math.min(100, Math.round((gameState.score / 1000) * 100))}%`;
+            document.getElementById('modalWords').innerText = `${gameState.wordIndex} / ${VOCABULARY.length}`;
+
+            document.getElementById('resultModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('resultModal').classList.add('hidden');
+        }
+
+        function retryCurrentMode() {
+            closeModal();
+            if (gameState.currentMode === 'scramble') startScrambleMode();
+            else if (gameState.currentMode === 'meteor') startMeteorMode();
+            else if (gameState.currentMode === 'drill') startDrillMode();
+        }
+
+        function exitToMenu() {
+            sfx.click();
+            showScreen('menuScreen');
+        }
+
+        // Badges Management
+        function unlockBadge(badgeId) {
+            if (!gameState.unlockedBadges.includes(badgeId)) {
+                gameState.unlockedBadges.push(badgeId);
+                updateGlobalHeader();
+            }
+        }
+
+        function renderBadges() {
+            const grid = document.getElementById('badgeGrid');
+            grid.innerHTML = BADGES.map(badge => {
+                const unlocked = gameState.unlockedBadges.includes(badge.id);
+                return `
+                    <div class="glass-panel p-5 rounded-2xl flex items-center space-x-4 ${unlocked ? 'border-amber-500/40 bg-slate-800/80' : 'opacity-50 border-slate-800'} transition">
+                        <div class="w-12 h-12 rounded-xl ${unlocked ? 'bg-amber-500/20' : 'bg-slate-800'} flex items-center justify-center text-2xl ${badge.color}">
+                            <i class="fa-solid ${badge.icon}"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-outfit font-bold text-white text-base">${badge.name}</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">${badge.desc}</p>
+                            <span class="inline-block mt-2 text-[10px] font-bold uppercase tracking-wider ${unlocked ? 'text-amber-400' : 'text-slate-600'}">
+                                ${unlocked ? 'Unlocked ✓' : 'Locked'}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Initialize menu on startup
+        updateGlobalHeader();
+    </script>
+</body>
+</html>
