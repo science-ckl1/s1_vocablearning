@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hazard Warning Symbols - Matching & Spelling Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace'],
+                    },
+                    colors: {
+                        hazard: {
+                            yellow: '#f59e0b',
+                            red: '#ef4444',
+                            orange: '#f97316',
+                            dark: '#0f172a',
+                            card: '#1e293b',
+                            accent: '#38bdf8'
+                        }
+                    },
+                    animation: {
+                        'bounce-short': 'bounceShort 0.3s ease-in-out',
+                        'shake': 'shake 0.4s ease-in-out',
+                        'pulse-glow': 'pulseGlow 2s infinite',
+                        'float': 'float 3s ease-in-out infinite'
+                    },
+                    keyframes: {
+                        bounceShort: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.08)' }
+                        },
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '20%, 60%': { transform: 'translateX(-8px)' },
+                            '40%, 80%': { transform: 'translateX(8px)' }
+                        },
+                        pulseGlow: {
+                            '0%, 100%': { boxShadow: '0 0 15px rgba(56, 189, 248, 0.3)' },
+                            '50%': { boxShadow: '0 0 25px rgba(56, 189, 248, 0.7)' }
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0px)' },
+                            '50%': { transform: 'translateY(-6px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #0b0f19;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.08) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(239, 68, 68, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 50%, rgba(56, 189, 248, 0.05) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: #f8fafc;
+            user-select: none;
+        }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="h-full flex flex-col font-sans overflow-x-hidden antialiased">
+
+    <canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+    <div class="flex-1 flex flex-col max-w-6xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <!-- Header Section -->
+        <header class="glass-panel rounded-2xl p-4 sm:p-6 mb-6 shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="flex flex-col md:flex-row items-center justify-between gap-4 relative z-10">
+                <div class="flex items-center gap-3 text-center md:text-left">
+                    <div class="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-lg animate-float">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                            Hazard warning <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-red-400">symbols</span>
+                        </h1>
+                        <p class="text-xs sm:text-sm text-slate-400">Interactive Lab Safety Matching & Spelling Academy</p>
+                    </div>
+                </div>
+
+                <!-- Stats Bar -->
+                <div class="flex items-center gap-3 bg-slate-900/80 px-4 py-2 rounded-xl border border-slate-700/60 shadow-inner">
+                    <div class="flex items-center gap-2 px-2">
+                        <span class="text-xs uppercase font-semibold text-slate-400">Score</span>
+                        <span id="scoreDisplay" class="text-xl font-extrabold font-mono text-amber-400">0</span>
+                    </div>
+                    <div class="h-6 w-px bg-slate-700"></div>
+                    <div class="flex items-center gap-2 px-2">
+                        <span class="text-xs uppercase font-semibold text-slate-400">Streak</span>
+                        <span id="streakDisplay" class="text-xl font-extrabold font-mono text-orange-400">0🔥</span>
+                    </div>
+                    <div class="h-6 w-px bg-slate-700"></div>
+                    <button id="soundToggleBtn" class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 transition-colors focus:outline-none focus:ring-2 focus:ring-amber-500" title="Toggle Sound">
+                        <svg id="soundOnIcon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/>
+                        </svg>
+                        <svg id="soundOffIcon" class="w-5 h-5 hidden text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z M17 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <nav class="flex flex-wrap items-center justify-center md:justify-start gap-2 mt-6 pt-4 border-t border-slate-700/50">
+                <button data-tab="matching" class="nav-tab active-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-md bg-amber-500 text-slate-950 hover:bg-amber-400">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 4a2 2 0 114 0v1a2 2 0 01-2 2 2 2 0 01-2-2V4zM4 7a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V7z"/>
+                    </svg>
+                    🧩 Symbol Matching
+                </button>
+                
+                <button data-tab="spelling" class="nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/>
+                    </svg>
+                    🔤 Spelling Challenge
+                </button>
+
+                <button data-tab="quiz" class="nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                    ⚡ Speed Quiz
+                </button>
+            </nav>
+        </header>
+
+        <main class="flex-1 relative">
+            
+            <!-- Matching View -->
+            <section id="matchingView" class="game-view space-y-6">
+                <div class="glass-panel rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-l-4 border-l-amber-500">
+                    <div>
+                        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                            <span>Match the Hazard Symbols</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">6 Hazard Cards</span>
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-300 mt-1">Tap a symbol card on the left, then tap its matching hazard name or safety description on the right!</p>
+                    </div>
+                    <button id="resetMatchingBtn" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-semibold transition-colors border border-slate-700 shadow-md">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Shuffle Board
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Hazard Symbols</h3>
+                        <div id="symbolCardsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-3"></div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 px-1">Hazard Meanings & Terms</h3>
+                        <div id="termCardsContainer" class="grid grid-cols-1 gap-3"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="spellingView" class="game-view hidden space-y-6">
+                <div class="glass-panel rounded-2xl p-6 shadow-xl border-t-4 border-t-amber-500">
+                    <div class="flex items-center justify-between mb-6">
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold uppercase px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                                Card <span id="spellingCurrentIndex">1</span> of 6
+                            </span>
+                            <div class="h-2 w-32 sm:w-48 bg-slate-800 rounded-full overflow-hidden">
+                                <div id="spellingProgressBar" class="h-full bg-gradient-to-r from-amber-500 to-orange-500 transition-all duration-500 w-1/6"></div>
+                            </div>
+                        </div>
+                        <button id="skipSpellingBtn" class="text-xs font-semibold text-slate-400 hover:text-white transition-colors flex items-center gap-1">
+                            Next Symbol ➔
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                        <div class="md:col-span-5 flex flex-col items-center justify-center p-6 bg-slate-900/90 rounded-2xl border border-slate-800 shadow-inner group">
+                            <div id="spellingSymbolContainer" class="w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center p-2 transform group-hover:scale-105 transition-transform duration-300"></div>
+                            <div id="spellingNumberBadge" class="mt-3 text-xs font-mono font-bold text-amber-400 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20">
+                                Symbol (1)
+                            </div>
+                        </div>
+
+                        <div class="md:col-span-7 flex flex-col items-center md:items-start space-y-6">
+                            <div class="w-full bg-slate-800/60 rounded-xl p-4 border border-slate-700/60">
+                                <div class="text-xs text-amber-400 font-bold uppercase tracking-wider mb-1">Hazard Clue</div>
+                                <p id="spellingClueText" class="text-sm sm:text-base text-slate-200"></p>
+                            </div>
+
+                            <div class="w-full">
+                                <div class="text-xs font-bold uppercase text-slate-400 mb-2">Spell the hazard name:</div>
+                                <div id="spellingAnswerSlots" class="flex flex-wrap gap-2 justify-center md:justify-start min-h-[50px]"></div>
+                            </div>
+
+                            <div class="w-full space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-xs font-bold uppercase text-slate-400">Available Letters</span>
+                                    <div class="flex items-center gap-2">
+                                        <button id="spellingHintBtn" class="text-xs px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 hover:bg-amber-500/30 transition-colors border border-amber-500/30 flex items-center gap-1">
+                                            💡 Get Hint
+                                        </button>
+                                        <button id="spellingClearBtn" class="text-xs px-2.5 py-1 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors border border-slate-700">
+                                            Clear
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="spellingLetterPool" class="flex flex-wrap gap-2 justify-center md:justify-start"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="quizView" class="game-view hidden space-y-6">
+                <div class="glass-panel rounded-2xl p-6 max-w-3xl mx-auto shadow-2xl relative overflow-hidden">
+                    <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-700/60">
+                        <div class="flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-red-500 animate-ping"></span>
+                            <span class="text-sm font-bold text-white uppercase tracking-wider">Speed Challenge</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-1.5 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800 font-mono">
+                                <span class="text-xs text-slate-400">⏱️</span>
+                                <span id="quizTimer" class="text-base font-extrabold text-amber-400">15s</span>
+                            </div>
+                            <div class="text-sm text-slate-400">
+                                Q: <span id="quizCurrentQ" class="font-bold text-white">1</span>/6
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6 text-center">
+                        <div class="flex justify-center">
+                            <div id="quizSymbolDisplay" class="w-36 h-36 sm:w-44 sm:h-44 bg-slate-900 rounded-2xl p-3 border border-slate-800 flex items-center justify-center shadow-inner"></div>
+                        </div>
+
+                        <h3 id="quizQuestionText" class="text-lg sm:text-xl font-bold text-slate-100">
+                            Which hazard symbol is shown above?
+                        </h3>
+
+                        <div id="quizOptionsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="victoryModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="glass-panel rounded-3xl p-6 sm:p-8 max-w-md w-full text-center space-y-6 border border-amber-500/30 shadow-2xl transform scale-95 transition-transform duration-300" id="victoryModalCard">
+            <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-amber-500 to-orange-500 flex items-center justify-center text-slate-950 shadow-lg text-4xl animate-bounce">
+                🏆
+            </div>
+            <div>
+                <h3 class="text-2xl sm:text-3xl font-extrabold text-white">Laboratory Master!</h3>
+                <p id="victorySubtitle" class="text-sm text-slate-300 mt-1">You have successfully mastered all hazard warning symbols!</p>
+            </div>
+            <div class="bg-slate-900/90 rounded-2xl p-4 grid grid-cols-2 gap-3 border border-slate-800 text-left">
+                <div>
+                    <span class="text-xs font-medium text-slate-400 block">Final Score</span>
+                    <span id="modalFinalScore" class="text-2xl font-extrabold font-mono text-amber-400">0</span>
+                </div>
+                <div>
+                    <span class="text-xs font-medium text-slate-400 block">Best Streak</span>
+                    <span id="modalBestStreak" class="text-2xl font-extrabold font-mono text-orange-400">0🔥</span>
+                </div>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <button id="modalPlayAgainBtn" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-slate-950 font-bold hover:brightness-110 transition-all shadow-lg">
+                    Play Again 🔄
+                </button>
+                <button id="modalSwitchModeBtn" class="py-3 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold transition-colors border border-slate-700">
+                    Switch Mode
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const HAZARD_DATA = [
+            {
+                id: 'flammable',
+                number: 1,
+                name: 'Flammable',
+                spellingName: 'FLAMMABLE',
+                clue: 'Catches fire easily when exposed to heat, sparks, or naked flames.',
+                description: 'Substances that ignite easily and burn rapidly in air when exposed to a spark or heat source.',
+                badgeBg: 'bg-red-500/20 text-red-400 border-red-500/30',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
+                        <g transform="rotate(45 50 50)">
+                            <rect x="15" y="15" width="70" height="70" rx="4" fill="#ef4444" stroke="#000000" stroke-width="3"/>
+                            <rect x="19" y="19" width="62" height="62" rx="2" fill="none" stroke="#ffffff" stroke-width="2"/>
+                        </g>
+                        <path d="M50 71 c-12 0 -18 -8 -18 -16 c0 -10 10 -18 12 -26 c3 6 8 8 10 5 c4 10 14 10 14 21 c0 9 -8 16 -18 16 z M48 67 c6 0 10 -4 10 -9 c0 -5 -4 -8 -6 -12 c-2 4 -5 5 -6 3 c-2 4 -4 7 -4 10 c0 4 3 8 6 8 z" fill="#000000"/>
+                        <path d="M30 72 h40 v3 h-40 z" fill="#000000"/>
+                    </svg>`
+            },
+            {
+                id: 'corrosive',
+                number: 2,
+                name: 'Corrosive',
+                spellingName: 'CORROSIVE',
+                clue: 'Attacks and chemically destroys living skin tissue and corrodes metals.',
+                description: 'Causes severe chemical burns to skin, eye damage, and corrodes metals upon contact.',
+                badgeBg: 'bg-slate-700/40 text-slate-200 border-slate-600',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
+                        <g transform="rotate(45 50 50)">
+                            <rect x="15" y="15" width="70" height="70" rx="4" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+                            <rect x="19" y="19" width="62" height="62" rx="2" fill="none" stroke="#000000" stroke-width="1.5"/>
+                        </g>
+                        <path d="M15 50 L50 85 L85 50 Z" fill="#000000"/>
+                        <path d="M 31 23 L 39 31 L 36 34 L 28 26 Z" fill="#ffffff" stroke="#000" stroke-width="1.5"/>
+                        <path d="M 39 31 C 40 37, 40 39, 41 45" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="2,2"/>
+                        <path d="M 69 23 L 61 31 L 64 34 L 72 26 Z" fill="#ffffff" stroke="#000" stroke-width="1.5"/>
+                        <path d="M 61 31 C 60 37, 60 39, 59 45" fill="none" stroke="#000" stroke-width="2" stroke-dasharray="2,2"/>
+                        <rect x="25" y="54" width="22" height="8" rx="1" fill="#ffffff" stroke="#000" stroke-width="1.5"/>
+                        <circle cx="36" cy="54" r="3" fill="#000"/>
+                        <path d="M 57 55 Q 63 52 71 55 Q 73 59 69 62 L 63 62 L 57 57 Z" fill="#ffffff" stroke="#000" stroke-width="1.5"/>
+                        <circle cx="59" cy="54" r="2.5" fill="#000"/>
+                    </svg>`
+            },
+            {
+                id: 'harmful',
+                number: 4,
+                name: 'Harmful',
+                spellingName: 'HARMFUL',
+                clue: 'May cause health hazards or damage to body if swallowed, inhaled, or absorbed.',
+                description: 'Substances that can cause health risks or illness, though generally less acute than toxic chemicals.',
+                badgeBg: 'bg-amber-500/20 text-amber-300 border-amber-500/30',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
+                        <g transform="rotate(45 50 50)">
+                            <rect x="15" y="15" width="70" height="70" rx="4" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+                            <rect x="19" y="19" width="62" height="62" rx="2" fill="none" stroke="#000000" stroke-width="1.5"/>
+                        </g>
+                        <path d="M50 25 L50 75 M44 32 L50 38 L56 32 M43 42 L50 48 L57 42 M43 52 L50 58 L57 52 M44 62 L50 68 L56 62" fill="none" stroke="#000000" stroke-width="2.5" stroke-linecap="round"/>
+                        <path d="M28 28 L72 72 M72 28 L28 72" stroke="#000000" stroke-width="9" stroke-linecap="square"/>
+                    </svg>`
+            },
+            {
+                id: 'toxic',
+                number: 5,
+                name: 'Toxic',
+                spellingName: 'TOXIC',
+                clue: 'Causes serious illness, organ damage, or death even in very small amounts.',
+                description: 'Poisonous substances capable of causing severe damage to health or death if swallowed, inhaled, or absorbed.',
+                badgeBg: 'bg-purple-500/20 text-purple-300 border-purple-500/30',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
+                        <g transform="rotate(45 50 50)">
+                            <rect x="15" y="15" width="70" height="70" rx="4" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+                            <rect x="19" y="19" width="62" height="62" rx="2" fill="none" stroke="#000000" stroke-width="1.5"/>
+                        </g>
+                        <path d="M26 30 L74 70 M74 30 L26 70" stroke="#000" stroke-width="7" stroke-linecap="round"/>
+                        <circle cx="25" cy="27" r="3.5" fill="#000"/>
+                        <circle cx="28" cy="32" r="3.5" fill="#000"/>
+                        <circle cx="75" cy="27" r="3.5" fill="#000"/>
+                        <circle cx="72" cy="32" r="3.5" fill="#000"/>
+                        <circle cx="25" cy="73" r="3.5" fill="#000"/>
+                        <circle cx="28" cy="68" r="3.5" fill="#000"/>
+                        <circle cx="75" cy="73" r="3.5" fill="#000"/>
+                        <circle cx="72" cy="68" r="3.5" fill="#000"/>
+                        <path d="M 35 44 C 35 32, 65 32, 65 44 C 65 52, 58 54, 57 59 L 43 59 C 42 54, 35 52, 35 44 Z" fill="#ffffff" stroke="#000" stroke-width="3"/>
+                        <ellipse cx="43" cy="45" rx="4" ry="5" fill="#000"/>
+                        <ellipse cx="57" cy="45" rx="4" ry="5" fill="#000"/>
+                        <polygon points="50,51 47,55 53,55" fill="#000"/>
+                        <path d="M43 59 L43 65 M48 59 L48 65 M52 59 L52 65 M57 59 L57 65" stroke="#000" stroke-width="2.5"/>
+                    </svg>`
+            },
+            {
+                id: 'irritant',
+                number: 6,
+                name: 'Irritant',
+                spellingName: 'IRRITANT',
+                clue: 'Causes temporary redness, inflammation, or itching to eyes, skin, or throat.',
+                description: 'Non-corrosive chemicals that cause temporary redness, itching, or swelling on contact with skin or eyes.',
+                badgeBg: 'bg-orange-500/20 text-orange-300 border-orange-500/30',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
+                        <g transform="rotate(45 50 50)">
+                            <rect x="15" y="15" width="70" height="70" rx="4" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+                            <rect x="19" y="19" width="62" height="62" rx="2" fill="none" stroke="#000000" stroke-width="1.5"/>
+                        </g>
+                        <path d="M28 28 L72 72 M72 28 L28 72" stroke="#000000" stroke-width="12" stroke-linecap="square"/>
+                    </svg>`
+            },
+            {
+                id: 'oxidizing',
+                number: 7,
+                name: 'Oxidizing',
+                spellingName: 'OXIDIZING',
+                clue: 'Releases oxygen easily, causing or greatly intensifying fires of other materials.',
+                description: 'Chemicals that provide oxygen or promote combustion, causing other substances to burn fiercely.',
+                badgeBg: 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+                svg: `<svg viewBox="0 0 100 100" class="w-full h-full drop-shadow-md">
+                        <g transform="rotate(45 50 50)">
+                            <rect x="15" y="15" width="70" height="70" rx="4" fill="#f59e0b" stroke="#000000" stroke-width="3"/>
+                            <rect x="19" y="19" width="62" height="62" rx="2" fill="none" stroke="#000000" stroke-width="1.5"/>
+                        </g>
+                        <circle cx="50" cy="58" r="12" fill="none" stroke="#000000" stroke-width="4"/>
+                        <path d="M50 50 c-8 -6 -10 -14 -10 -20 c0 -8 7 -14 10 -20 c3 6 10 12 10 20 c0 6 -2 14 -10 20 z" fill="#000000"/>
+                    </svg>`
+            }
+        ];
+
+        class SoundSynth {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                    if (AudioCtx) this.ctx = new AudioCtx();
+                }
+            }
+
+            playTone(freq, type = 'sine', duration = 0.15, gainVal = 0.1) {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+
+                try {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    
+                    gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {
+                    console.log('Audio playback exception', e);
+                }
+            }
+
+            playMatchSuccess() {
+                if (!this.enabled) return;
+                this.playTone(523.25, 'sine', 0.12, 0.15);
+                setTimeout(() => this.playTone(659.25, 'sine', 0.12, 0.15), 80);
+                setTimeout(() => this.playTone(783.99, 'sine', 0.25, 0.18), 160);
+            }
+
+            playWrong() {
+                if (!this.enabled) return;
+                this.playTone(180, 'sawtooth', 0.25, 0.15);
+            }
+
+            playTilePop() {
+                if (!this.enabled) return;
+                this.playTone(400, 'sine', 0.05, 0.08);
+            }
+
+            playVictory() {
+                if (!this.enabled) return;
+                const notes = [440, 554.37, 659.25, 880];
+                notes.forEach((freq, idx) => {
+                    setTimeout(() => this.playTone(freq, 'triangle', 0.3, 0.2), idx * 100);
+                });
+            }
+        }
+
+        const audio = new SoundSynth();
+
+        let state = {
+            activeTab: 'matching',
+            score: 0,
+            streak: 0,
+            soundOn: true,
+            
+            // Matching State
+            selectedSymbolCard: null,
+            selectedTermCard: null,
+            matchedPairs: new Set(),
+
+            // Spelling State
+            spellingIndex: 0,
+            spellingCurrentWord: '',
+            spellingUserAnswers: [],
+            spellingLetterPool: [],
+            spellingDataList: [],
+
+            // Quiz State
+            quizIndex: 0,
+            quizScore: 0,
+            quizTimerVal: 15,
+            quizInterval: null,
+            quizQuestions: []
+        };
+
+        const DOM = {
+            scoreDisplay: document.getElementById('scoreDisplay'),
+            streakDisplay: document.getElementById('streakDisplay'),
+            soundToggleBtn: document.getElementById('soundToggleBtn'),
+            soundOnIcon: document.getElementById('soundOnIcon'),
+            soundOffIcon: document.getElementById('soundOffIcon'),
+            
+            // Views
+            matchingView: document.getElementById('matchingView'),
+            spellingView: document.getElementById('spellingView'),
+            quizView: document.getElementById('quizView'),
+            
+            // Containers
+            symbolCardsContainer: document.getElementById('symbolCardsContainer'),
+            termCardsContainer: document.getElementById('termCardsContainer'),
+            resetMatchingBtn: document.getElementById('resetMatchingBtn'),
+            
+            // Spelling
+            spellingCurrentIndex: document.getElementById('spellingCurrentIndex'),
+            spellingProgressBar: document.getElementById('spellingProgressBar'),
+            spellingSymbolContainer: document.getElementById('spellingSymbolContainer'),
+            spellingNumberBadge: document.getElementById('spellingNumberBadge'),
+            spellingClueText: document.getElementById('spellingClueText'),
+            spellingAnswerSlots: document.getElementById('spellingAnswerSlots'),
+            spellingLetterPool: document.getElementById('spellingLetterPool'),
+            spellingHintBtn: document.getElementById('spellingHintBtn'),
+            spellingClearBtn: document.getElementById('spellingClearBtn'),
+            skipSpellingBtn: document.getElementById('skipSpellingBtn'),
+
+            // Quiz
+            quizTimer: document.getElementById('quizTimer'),
+            quizCurrentQ: document.getElementById('quizCurrentQ'),
+            quizSymbolDisplay: document.getElementById('quizSymbolDisplay'),
+            quizQuestionText: document.getElementById('quizQuestionText'),
+            quizOptionsGrid: document.getElementById('quizOptionsGrid'),
+
+            // Victory Modal
+            victoryModal: document.getElementById('victoryModal'),
+            victoryModalCard: document.getElementById('victoryModalCard'),
+            victorySubtitle: document.getElementById('victorySubtitle'),
+            modalFinalScore: document.getElementById('modalFinalScore'),
+            modalBestStreak: document.getElementById('modalBestStreak'),
+            modalPlayAgainBtn: document.getElementById('modalPlayAgainBtn'),
+            modalSwitchModeBtn: document.getElementById('modalSwitchModeBtn')
+        };
+
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function updateScore(deltaPoints) {
+            if (deltaPoints > 0) {
+                state.streak += 1;
+                state.score += deltaPoints + (state.streak * 20);
+            } else {
+                state.streak = 0;
+            }
+            DOM.scoreDisplay.textContent = state.score;
+            DOM.streakDisplay.textContent = `${state.streak}🔥`;
+        }
+
+        document.querySelectorAll('.nav-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const targetTab = btn.getAttribute('data-tab');
+                switchTab(targetTab);
+            });
+        });
+
+        function switchTab(tab) {
+            state.activeTab = tab;
+            audio.playTilePop();
+
+            document.querySelectorAll('.nav-tab').forEach(btn => {
+                if (btn.getAttribute('data-tab') === tab) {
+                    btn.className = "nav-tab active-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all shadow-md bg-amber-500 text-slate-950 hover:bg-amber-400";
+                } else {
+                    btn.className = "nav-tab flex items-center gap-2 px-4 py-2.5 rounded-xl font-semibold text-sm transition-all bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white";
+                }
+            });
+
+            DOM.matchingView.classList.toggle('hidden', tab !== 'matching');
+            DOM.spellingView.classList.toggle('hidden', tab !== 'spelling');
+            DOM.quizView.classList.toggle('hidden', tab !== 'quiz');
+
+            if (tab === 'matching') initMatchingGame();
+            if (tab === 'spelling') initSpellingGame();
+            if (tab === 'quiz') startSpeedQuiz();
+        }
+
+        DOM.soundToggleBtn.addEventListener('click', () => {
+            audio.enabled = !audio.enabled;
+            state.soundOn = audio.enabled;
+            DOM.soundOnIcon.classList.toggle('hidden', !state.soundOn);
+            DOM.soundOffIcon.classList.toggle('hidden', state.soundOn);
+        });
+
+        function initMatchingGame() {
+            state.selectedSymbolCard = null;
+            state.selectedTermCard = null;
+            state.matchedPairs.clear();
+
+            const shuffledSymbols = shuffle(HAZARD_DATA);
+            DOM.symbolCardsContainer.innerHTML = shuffledSymbols.map(item => `
+                <button data-id="${item.id}" class="symbol-card group relative p-4 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/70 rounded-2xl flex flex-col items-center justify-center gap-2 transition-all duration-200 transform hover:-translate-y-1 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <div class="w-20 h-20 sm:w-24 sm:h-24 p-1">
+                        ${item.svg}
+                    </div>
+                    <span class="text-xs font-mono font-semibold text-slate-400 group-hover:text-amber-300">Symbol (${item.number})</span>
+                    <div class="check-mark absolute top-2 right-2 hidden text-emerald-400 bg-emerald-950/80 rounded-full p-1 border border-emerald-500/40">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                </button>
+            `).join('');
+
+            const shuffledTerms = shuffle(HAZARD_DATA);
+            DOM.termCardsContainer.innerHTML = shuffledTerms.map(item => `
+                <button data-id="${item.id}" class="term-card p-4 bg-slate-900/90 hover:bg-slate-800 border border-slate-700/70 rounded-2xl text-left flex items-start gap-4 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-amber-400">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center font-bold text-amber-400 text-sm shrink-0">
+                        ?
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h4 class="text-base font-bold text-white flex items-center justify-between">
+                            <span>${item.name}</span>
+                        </h4>
+                        <p class="text-xs text-slate-300 mt-1 leading-relaxed">${item.description}</p>
+                    </div>
+                    <div class="check-mark hidden text-emerald-400 bg-emerald-950/80 rounded-full p-1 border border-emerald-500/40 shrink-0">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+                    </div>
+                </button>
+            `).join('');
+
+            document.querySelectorAll('.symbol-card').forEach(card => {
+                card.addEventListener('click', () => handleMatchingSelection('symbol', card));
+            });
+
+            document.querySelectorAll('.term-card').forEach(card => {
+                card.addEventListener('click', () => handleMatchingSelection('term', card));
+            });
+        }
+
+        DOM.resetMatchingBtn.addEventListener('click', () => {
+            audio.playTilePop();
+            initMatchingGame();
+        });
+
+        function handleMatchingSelection(type, cardEl) {
+            const id = cardEl.getAttribute('data-id');
+            if (state.matchedPairs.has(id)) return;
+
+            audio.playTilePop();
+
+            if (type === 'symbol') {
+                document.querySelectorAll('.symbol-card').forEach(c => c.classList.remove('ring-4', 'ring-amber-400', 'bg-slate-800'));
+                cardEl.classList.add('ring-4', 'ring-amber-400', 'bg-slate-800');
+                state.selectedSymbolCard = { id, el: cardEl };
+            } else {
+                document.querySelectorAll('.term-card').forEach(c => c.classList.remove('ring-4', 'ring-amber-400', 'bg-slate-800'));
+                cardEl.classList.add('ring-4', 'ring-amber-400', 'bg-slate-800');
+                state.selectedTermCard = { id, el: cardEl };
+            }
+
+            if (state.selectedSymbolCard && state.selectedTermCard) {
+                if (state.selectedSymbolCard.id === state.selectedTermCard.id) {
+                    const matchedId = state.selectedSymbolCard.id;
+                    state.matchedPairs.add(matchedId);
+                    
+                    audio.playMatchSuccess();
+                    updateScore(150);
+
+                    [state.selectedSymbolCard.el, state.selectedTermCard.el].forEach(el => {
+                        el.classList.remove('ring-4', 'ring-amber-400', 'bg-slate-800', 'hover:bg-slate-800');
+                        el.classList.add('bg-emerald-950/40', 'border-emerald-500/50', 'pointer-events-none');
+                        const checkMark = el.querySelector('.check-mark');
+                        if (checkMark) checkMark.classList.remove('hidden');
+                    });
+
+                    state.selectedSymbolCard = null;
+                    state.selectedTermCard = null;
+
+                    if (state.matchedPairs.size === HAZARD_DATA.length) {
+                        setTimeout(() => triggerVictoryModal('You matched all 6 hazard warning symbols!'), 600);
+                    }
+                } else {
+                    audio.playWrong();
+                    updateScore(0);
+
+                    const symbolEl = state.selectedSymbolCard.el;
+                    const termEl = state.selectedTermCard.el;
+
+                    [symbolEl, termEl].forEach(el => {
+                        el.classList.add('animate-shake', 'ring-4', 'ring-red-500');
+                    });
+
+                    setTimeout(() => {
+                        [symbolEl, termEl].forEach(el => {
+                            el.classList.remove('animate-shake', 'ring-4', 'ring-red-500', 'ring-amber-400', 'bg-slate-800');
+                        });
+                        state.selectedSymbolCard = null;
+                        state.selectedTermCard = null;
+                    }, 800);
+                }
+            }
+        }
+
+        function initSpellingGame() {
+            state.spellingDataList = shuffle(HAZARD_DATA);
+            state.spellingIndex = 0;
+            loadSpellingQuestion();
+        }
+
+        function loadSpellingQuestion() {
+            const currentItem = state.spellingDataList[state.spellingIndex];
+            state.spellingCurrentWord = currentItem.spellingName;
+            state.spellingUserAnswers = new Array(state.spellingCurrentWord.length).fill('');
+
+            DOM.spellingCurrentIndex.textContent = state.spellingIndex + 1;
+            DOM.spellingProgressBar.style.width = `${((state.spellingIndex + 1) / state.spellingDataList.length) * 100}%`;
+            
+            DOM.spellingSymbolContainer.innerHTML = currentItem.svg;
+            DOM.spellingNumberBadge.textContent = `Symbol (${currentItem.number})`;
+            DOM.spellingClueText.textContent = currentItem.clue;
+
+            // Generate extra distractor letters
+            const extraCount = Math.max(2, 10 - state.spellingCurrentWord.length);
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            let pool = state.spellingCurrentWord.split('');
+            for (let i = 0; i < extraCount; i++) {
+                pool.push(alphabet[Math.floor(Math.random() * alphabet.length)]);
+            }
+            state.spellingLetterPool = shuffle(pool).map((char, index) => ({ id: index, char, used: false }));
+
+            renderSpellingSlots();
+            renderSpellingTiles();
+        }
+
+        function renderSpellingSlots() {
+            DOM.spellingAnswerSlots.innerHTML = state.spellingUserAnswers.map((char, idx) => `
+                <button onclick="handleSlotClick(${idx})" class="w-10 h-12 sm:w-12 sm:h-14 rounded-xl font-mono font-extrabold text-lg sm:text-xl flex items-center justify-center transition-all ${
+                    char ? 'bg-amber-500 text-slate-950 border-2 border-amber-300 shadow-md scale-100' : 'bg-slate-900/90 text-slate-500 border-2 border-dashed border-slate-700 hover:border-slate-500'
+                }">
+                    ${char || '_'}
+                </button>
+            `).join('');
+        }
+
+        function renderSpellingTiles() {
+            DOM.spellingLetterPool.innerHTML = state.spellingLetterPool.map(tile => `
+                <button onclick="handleLetterClick(${tile.id})" ${tile.used ? 'disabled' : ''} class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl font-mono font-bold text-base sm:text-lg transition-all ${
+                    tile.used ? 'bg-slate-800/40 text-slate-600 border border-slate-800 opacity-30 cursor-not-allowed' : 'bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 hover:border-amber-500/50 shadow-md hover:-translate-y-0.5'
+                }">
+                    ${tile.char}
+                </button>
+            `).join('');
+        }
+
+        window.handleLetterClick = function(tileId) {
+            const tile = state.spellingLetterPool.find(t => t.id === tileId);
+            if (!tile || tile.used) return;
+
+            const emptyIdx = state.spellingUserAnswers.findIndex(val => val === '');
+            if (emptyIdx !== -1) {
+                audio.playTilePop();
+                tile.used = true;
+                state.spellingUserAnswers[emptyIdx] = tile.char;
+                renderSpellingSlots();
+                renderSpellingTiles();
+                checkSpellingComplete();
+            }
+        };
+
+        window.handleSlotClick = function(slotIdx) {
+            const charToFree = state.spellingUserAnswers[slotIdx];
+            if (!charToFree) return;
+
+            audio.playTilePop();
+            state.spellingUserAnswers[slotIdx] = '';
+
+            const usedTile = state.spellingLetterPool.find(t => t.char === charToFree && t.used);
+            if (usedTile) usedTile.used = false;
+
+            renderSpellingSlots();
+            renderSpellingTiles();
+        };
+
+        function checkSpellingComplete() {
+            if (state.spellingUserAnswers.includes('')) return;
+
+            const userWord = state.spellingUserAnswers.join('');
+            if (userWord === state.spellingCurrentWord) {
+                audio.playMatchSuccess();
+                updateScore(200);
+
+                document.querySelectorAll('#spellingAnswerSlots button').forEach(btn => {
+                    btn.classList.add('bg-emerald-500', 'text-slate-950', 'border-emerald-300', 'animate-bounce-short');
+                });
+
+                setTimeout(() => {
+                    state.spellingIndex++;
+                    if (state.spellingIndex >= state.spellingDataList.length) {
+                        triggerVictoryModal('Spelling Master! You spelled all hazard symbols correctly!');
+                    } else {
+                        loadSpellingQuestion();
+                    }
+                }, 1000);
+            } else {
+                audio.playWrong();
+                updateScore(0);
+                DOM.spellingAnswerSlots.classList.add('animate-shake');
+                setTimeout(() => DOM.spellingAnswerSlots.classList.remove('animate-shake'), 500);
+            }
+        }
+
+        DOM.spellingClearBtn.addEventListener('click', () => {
+            audio.playTilePop();
+            state.spellingUserAnswers.fill('');
+            state.spellingLetterPool.forEach(t => t.used = false);
+            renderSpellingSlots();
+            renderSpellingTiles();
+        });
+
+        DOM.spellingHintBtn.addEventListener('click', () => {
+            const emptyIdx = state.spellingUserAnswers.findIndex(val => val === '');
+            if (emptyIdx === -1) return;
+
+            const correctChar = state.spellingCurrentWord[emptyIdx];
+            const matchingTile = state.spellingLetterPool.find(t => t.char === correctChar && !t.used);
+            
+            if (matchingTile) {
+                handleLetterClick(matchingTile.id);
+            }
+        });
+
+        DOM.skipSpellingBtn.addEventListener('click', () => {
+            audio.playTilePop();
+            state.spellingIndex++;
+            if (state.spellingIndex >= state.spellingDataList.length) {
+                triggerVictoryModal('Completed Spelling Challenge!');
+            } else {
+                loadSpellingQuestion();
+            }
+        });
+
+        function startSpeedQuiz() {
+            state.quizQuestions = shuffle(HAZARD_DATA);
+            state.quizIndex = 0;
+            state.quizScore = 0;
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            if (state.quizIndex >= state.quizQuestions.length) {
+                triggerVictoryModal('Speed Quiz Complete! Excellent reaction time!');
+                return;
+            }
+
+            const currentItem = state.quizQuestions[state.quizIndex];
+            DOM.quizCurrentQ.textContent = state.quizIndex + 1;
+            DOM.quizSymbolDisplay.innerHTML = currentItem.svg;
+
+            // Generate 4 options (1 correct, 3 wrong)
+            const wrongOptions = HAZARD_DATA.filter(h => h.id !== currentItem.id);
+            const shuffledWrong = shuffle(wrongOptions).slice(0, 3);
+            const options = shuffle([currentItem, ...shuffledWrong]);
+
+            DOM.quizOptionsGrid.innerHTML = options.map((opt, i) => `
+                <button data-id="${opt.id}" onclick="handleQuizAnswer('${opt.id}', '${currentItem.id}', this)" class="quiz-option-btn p-4 bg-slate-900/90 hover:bg-slate-800 border border-slate-700 hover:border-amber-400 rounded-2xl text-left font-semibold text-white transition-all transform hover:-translate-y-0.5 focus:outline-none">
+                    <span class="inline-block w-6 h-6 rounded-lg bg-slate-800 text-amber-400 text-xs text-center leading-6 mr-2 font-mono">${i + 1}</span>
+                    ${opt.name}
+                </button>
+            `).join('');
+
+            startQuizTimer();
+        }
+
+        function startQuizTimer() {
+            clearInterval(state.quizInterval);
+            state.quizTimerVal = 15;
+            DOM.quizTimer.textContent = `${state.quizTimerVal}s`;
+
+            state.quizInterval = setInterval(() => {
+                state.quizTimerVal--;
+                DOM.quizTimer.textContent = `${state.quizTimerVal}s`;
+
+                if (state.quizTimerVal <= 0) {
+                    clearInterval(state.quizInterval);
+                    audio.playWrong();
+                    updateScore(0);
+                    
+                    // Reveal the correct answer in green on timeout
+                    const currentItem = state.quizQuestions[state.quizIndex];
+                    const allOptionBtns = DOM.quizOptionsGrid.querySelectorAll('button');
+                    allOptionBtns.forEach(btn => {
+                        btn.style.pointerEvents = 'none';
+                        if (btn.getAttribute('data-id') === currentItem.id) {
+                            btn.classList.remove('bg-slate-900/90', 'border-slate-700');
+                            btn.classList.add('bg-emerald-600', 'border-emerald-400', 'text-white', 'shadow-lg', 'shadow-emerald-500/30');
+                        }
+                    });
+
+                    setTimeout(() => {
+                        state.quizIndex++;
+                        loadQuizQuestion();
+                    }, 1000);
+                }
+            }, 1000);
+        }
+
+        window.handleQuizAnswer = function(selectedId, correctId, btnEl) {
+            clearInterval(state.quizInterval);
+
+            // Disable all option buttons during feedback transition
+            const allOptionBtns = DOM.quizOptionsGrid.querySelectorAll('button');
+            allOptionBtns.forEach(btn => {
+                btn.style.pointerEvents = 'none';
+                
+                // Highlight the correct answer green in all cases
+                if (btn.getAttribute('data-id') === correctId) {
+                    btn.classList.remove('bg-slate-900/90', 'hover:bg-slate-800', 'border-slate-700');
+                    btn.classList.add('bg-emerald-600', 'border-emerald-400', 'text-white', 'shadow-lg', 'shadow-emerald-500/30');
+                }
+            });
+
+            if (selectedId === correctId) {
+                audio.playMatchSuccess();
+                updateScore(100 + state.quizTimerVal * 10);
+            } else {
+                audio.playWrong();
+                updateScore(0);
+                
+                // Turn selected wrong answer button red
+                btnEl.classList.remove('bg-slate-900/90', 'hover:bg-slate-800', 'border-slate-700', 'bg-emerald-600', 'border-emerald-400');
+                btnEl.classList.add('bg-red-600', 'border-red-400', 'text-white', 'animate-shake', 'shadow-lg', 'shadow-red-500/30');
+            }
+
+            setTimeout(() => {
+                state.quizIndex++;
+                loadQuizQuestion();
+            }, 1000);
+        };
+
+        function triggerVictoryModal(subtitleText) {
+            audio.playVictory();
+            launchConfetti();
+
+            DOM.victorySubtitle.textContent = subtitleText;
+            DOM.modalFinalScore.textContent = state.score;
+            DOM.modalBestStreak.textContent = `${state.streak}🔥`;
+
+            DOM.victoryModal.classList.remove('opacity-0', 'pointer-events-none');
+            DOM.victoryModalCard.classList.remove('scale-95');
+            DOM.victoryModalCard.classList.add('scale-100');
+        }
+
+        function hideVictoryModal() {
+            DOM.victoryModal.classList.add('opacity-0', 'pointer-events-none');
+            DOM.victoryModalCard.classList.remove('scale-100');
+            DOM.victoryModalCard.classList.add('scale-95');
+        }
+
+        DOM.modalPlayAgainBtn.addEventListener('click', () => {
+            hideVictoryModal();
+            if (state.activeTab === 'matching') initMatchingGame();
+            if (state.activeTab === 'spelling') initSpellingGame();
+            if (state.activeTab === 'quiz') startSpeedQuiz();
+        });
+
+        DOM.modalSwitchModeBtn.addEventListener('click', () => {
+            hideVictoryModal();
+            switchTab('spelling');
+        });
+
+        function launchConfetti() {
+            const canvas = document.getElementById('confettiCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            const colors = ['#f59e0b', '#ef4444', '#38bdf8', '#10b981', '#a855f7'];
+
+            for (let i = 0; i < 120; i++) {
+                particles.push({
+                    x: canvas.width / 2,
+                    y: canvas.height / 2,
+                    vx: (Math.random() - 0.5) * 14,
+                    vy: (Math.random() - 0.7) * 16,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    size: Math.random() * 8 + 4,
+                    rotation: Math.random() * 360,
+                    rotationSpeed: (Math.random() - 0.5) * 10
+                });
+            }
+
+            function render() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                let alive = false;
+
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.vy += 0.3;
+                    p.rotation += p.rotationSpeed;
+
+                    if (p.y < canvas.height) alive = true;
+
+                    ctx.save();
+                    ctx.translate(p.x, p.y);
+                    ctx.rotate((p.rotation * Math.PI) / 180);
+                    ctx.fillStyle = p.color;
+                    ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+                    ctx.restore();
+                });
+
+                if (alive) {
+                    requestAnimationFrame(render);
+                } else {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
+            render();
+        }
+
+        window.onload = function() {
+            initMatchingGame();
+        };
+    </script>
+</body>
+</html>
