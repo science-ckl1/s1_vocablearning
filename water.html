@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,15 +7,15 @@
   <title>Water Particle Adventure | 水分子大冒險</title>
   <style>
     :root {
-      --primary: #1976d2;
-      --primary-dark: #0d47a1;
-      --bg-color: #f0f4f8;
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --bg-color: #f1f5f9;
       --panel-bg: #ffffff;
-      --text: #263238;
-      --accent-heat: #ff5722;
-      --accent-cool: #00bcd4;
-      --success: #2e7d32;
-      --warning: #f57c00;
+      --text: #1e293b;
+      --accent-heat: #f97316;
+      --accent-cool: #06b6d4;
+      --success: #16a34a;
+      --warning: #d97706;
     }
 
     * {
@@ -30,13 +31,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 15px;
+      padding: 14px;
       min-height: 100vh;
     }
 
     header {
       width: 100%;
-      max-width: 950px;
+      max-width: 980px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -44,11 +45,11 @@
       background: var(--panel-bg);
       padding: 12px 20px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
     }
 
     h1 {
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       color: var(--primary-dark);
       display: flex;
       flex-direction: column;
@@ -56,36 +57,36 @@
     }
 
     h1 span.zh {
-      font-size: 1.05rem;
-      color: #546e7a;
+      font-size: 1rem;
+      color: #64748b;
     }
 
     .lang-toggle-btn {
       background: var(--primary);
       color: white;
       border: none;
-      padding: 8px 16px;
+      padding: 8px 18px;
       border-radius: 20px;
       cursor: pointer;
-      font-weight: bold;
-      font-size: 0.9rem;
+      font-weight: 700;
+      font-size: 0.88rem;
       transition: all 0.2s;
     }
 
     .lang-toggle-btn:hover {
       background: var(--primary-dark);
-      transform: scale(1.03);
+      transform: translateY(-1px);
     }
 
     .main-container {
       width: 100%;
-      max-width: 950px;
+      max-width: 980px;
       display: grid;
-      grid-template-columns: 1.3fr 1fr;
+      grid-template-columns: 1.25fr 1fr;
       gap: 16px;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 860px) {
       .main-container {
         grid-template-columns: 1fr;
       }
@@ -95,7 +96,7 @@
       background: var(--panel-bg);
       border-radius: 14px;
       padding: 16px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
       display: flex;
       flex-direction: column;
       gap: 12px;
@@ -108,14 +109,14 @@
       background: #0f172a;
       border-radius: 10px;
       overflow: hidden;
-      border: 3px solid #cfd8dc;
+      border: 3px solid #cbd5e1;
     }
 
     canvas {
       display: block;
       width: 100%;
       height: 380px;
-      background: linear-gradient(to bottom, #1e293b, #0f172a);
+      background: radial-gradient(circle at 50% 100%, #1e293b, #090d16);
     }
 
     .canvas-hud {
@@ -133,7 +134,7 @@
       color: #fff;
       padding: 6px 12px;
       border-radius: 8px;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       backdrop-filter: blur(4px);
       border: 1px solid rgba(255,255,255,0.15);
     }
@@ -147,17 +148,18 @@
     .control-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
     }
 
     .temp-display {
-      font-size: 1.5rem;
+      font-size: 1.45rem;
       font-weight: 800;
-      min-width: 95px;
+      min-width: 105px;
       text-align: center;
       padding: 6px 10px;
-      background: #eceff1;
+      background: #e2e8f0;
       border-radius: 8px;
+      color: #0f172a;
     }
 
     .slider {
@@ -166,47 +168,56 @@
       border-radius: 4px;
       outline: none;
       -webkit-appearance: none;
-      background: linear-gradient(to right, #00bcd4, #ff9800, #f44336);
+      background: linear-gradient(to right, #06b6d4 0%, #38bdf8 15%, #3b82f6 50%, #f97316 85%, #ef4444 100%);
     }
 
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 22px;
-      height: 22px;
+      width: 24px;
+      height: 24px;
       border-radius: 50%;
       background: #ffffff;
-      border: 3px solid var(--primary);
+      border: 3.5px solid var(--primary);
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     }
 
+    /* 5 Exact Preset Buttons */
     .btn-group {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 8px;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
     }
 
     button.quick-btn {
-      padding: 8px;
-      border: 1px solid #b0bec5;
+      padding: 7px 4px;
+      border: 1.5px solid #cbd5e1;
       background: #f8fafc;
       border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-size: 0.78rem;
+      font-weight: 700;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.15s;
+      text-align: center;
+      line-height: 1.25;
     }
 
     button.quick-btn:hover {
       background: #e2e8f0;
-      border-color: #78909c;
+      border-color: #94a3b8;
     }
 
-    /* Explanation & Mission Panel */
+    button.quick-btn.active-preset {
+      background: #e0f2fe;
+      border-color: var(--primary);
+      color: var(--primary-dark);
+    }
+
+    /* Tabs & Content */
     .tabs {
       display: flex;
       gap: 8px;
-      border-bottom: 2px solid #eceff1;
+      border-bottom: 2px solid #e2e8f0;
       padding-bottom: 6px;
     }
 
@@ -215,7 +226,7 @@
       border: none;
       font-size: 0.92rem;
       font-weight: 700;
-      color: #78909c;
+      color: #64748b;
       padding: 6px 12px;
       cursor: pointer;
       border-radius: 6px;
@@ -223,7 +234,7 @@
 
     .tab-btn.active {
       color: var(--primary);
-      background: #e3f2fd;
+      background: #e0f2fe;
     }
 
     .tab-content {
@@ -238,11 +249,11 @@
     }
 
     .info-box {
-      background: #f1f5f9;
+      background: #f8fafc;
       border-left: 4px solid var(--primary);
       padding: 10px 14px;
       border-radius: 0 8px 8px 0;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       line-height: 1.45;
     }
 
@@ -254,8 +265,8 @@
 
     .quiz-question {
       font-weight: 700;
-      font-size: 0.95rem;
-      color: #1e293b;
+      font-size: 0.94rem;
+      color: #0f172a;
     }
 
     .quiz-options {
@@ -266,11 +277,11 @@
 
     .option-btn {
       text-align: left;
-      padding: 10px 12px;
+      padding: 9px 12px;
       border: 1.5px solid #cbd5e1;
       border-radius: 8px;
       background: white;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       cursor: pointer;
       transition: all 0.2s;
     }
@@ -289,8 +300,8 @@
 
     .option-btn.wrong {
       background: #ffebee !important;
-      border-color: #d32f2f !important;
-      color: #d32f2f;
+      border-color: #dc2626 !important;
+      color: #dc2626;
       font-weight: bold;
     }
 
@@ -298,7 +309,7 @@
       display: none;
       padding: 10px;
       border-radius: 8px;
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       line-height: 1.4;
     }
 
@@ -310,7 +321,7 @@
       font-weight: 800;
       padding: 4px 10px;
       border-radius: 20px;
-      font-size: 0.85rem;
+      font-size: 0.84rem;
     }
 
     .action-btn {
@@ -340,7 +351,7 @@
   </header>
 
   <div class="main-container">
-    <!-- Left Column: Interactive Simulation -->
+    <!-- Left Column: Simulation Canvas & Controls -->
     <div class="card">
       <div class="sim-wrapper">
         <canvas id="particleCanvas" width="500" height="380"></canvas>
@@ -350,8 +361,8 @@
             <span class="hud-state" id="stateName">Solid (Ice)</span>
           </div>
           <div class="hud-badge">
-            <span id="hudSpeedLabel">Avg Particle Speed: </span>
-            <span id="speedValue" style="color:#f59e0b; font-weight:bold;">Low</span>
+            <span id="hudSpeedLabel">Particle Motion: </span>
+            <span id="speedValue" style="color:#7dd3fc; font-weight:bold;">Vibrating in fixed positions</span>
           </div>
         </div>
       </div>
@@ -359,17 +370,20 @@
       <!-- Controls -->
       <div class="control-row">
         <div class="temp-display" id="tempText">-10 °C</div>
-        <input type="range" min="-20" max="120" value="-10" class="slider" id="tempSlider" oninput="updateTemperature(this.value)">
+        <input type="range" min="-20" max="120" value="-10" step="1" class="slider" id="tempSlider" oninput="updateTemperature(this.value)">
       </div>
 
+      <!-- Key Temperature Preset Buttons -->
       <div class="btn-group">
-        <button class="quick-btn" onclick="setTempPreset(-10)">❄️ <span class="txt-ice">Ice (-10°C)</span></button>
-        <button class="quick-btn" onclick="setTempPreset(25)">💧 <span class="txt-water">Water (25°C)</span></button>
-        <button class="quick-btn" onclick="setTempPreset(105)">💨 <span class="txt-steam">Steam (105°C)</span></button>
+        <button class="quick-btn" id="pbtn-ice" onclick="setTempPreset(-10)">❄️ <span class="txt-ice">Ice<br>(-10°C)</span></button>
+        <button class="quick-btn" id="pbtn-melt" onclick="setTempPreset(0)">⚖️ <span class="txt-melt"><br>0°C</span></button>
+        <button class="quick-btn" id="pbtn-water" onclick="setTempPreset(25)">💧 <span class="txt-water">Water<br>(25°C)</span></button>
+        <button class="quick-btn" id="pbtn-boil" onclick="setTempPreset(100)">🔥 <span class="txt-boil"><br>100°C</span></button>
+        <button class="quick-btn" id="pbtn-steam" onclick="setTempPreset(110)">💨 <span class="txt-steam">Steam<br>(110°C)</span></button>
       </div>
     </div>
 
-    <!-- Right Column: Interactive Missions, Science Notes & Quiz -->
+    <!-- Right Column: Scientific Explanations & Misconception Buster Quiz -->
     <div class="card">
       <div class="tabs">
         <button class="tab-btn active" id="tabBtn1" onclick="switchTab('observe')">🔍 <span id="tab1Title">Particle Intel</span></button>
@@ -380,15 +394,12 @@
       <div class="tab-content active" id="observeTab">
         <div class="score-badge" id="stateBadge">Current State: Solid (Ice)</div>
         <div class="info-box" id="particleDesc">
-          <strong>Particle Arrangement:</strong> Closely packed in a regular lattice. Particles vibrate around fixed positions with strong attracting forces.
+          <strong>Particle Arrangement:</strong> Closely packed in an orderly regular pattern. Particles vibrate about fixed positions with very strong attractive forces.
         </div>
-        <div class="info-box" style="border-left-color: #f59e0b;" id="stateChangeDesc">
-          <strong>Phase Transition Guide:</strong><br>
-          • <strong>Melting (熔化):</strong> Solid → Liquid at 0 °C<br>
-          • <strong>Freezing (凝固):</strong> Liquid → Solid at 0 °C<br>
-          • <strong>Evaporation (蒸發):</strong> Liquid → Gas at liquid surface (&lt; 100 °C)<br>
-          • <strong>Boiling (沸騰):</strong> Liquid → Gas throughout whole liquid at 100 °C<br>
-          • <strong>Condensation (凝結):</strong> Gas → Liquid at or below 100 °C
+        <div class="info-box" style="border-left-color: #0284c7;" id="criticalPointDesc">
+          <strong>Key Phase Transition Points:</strong><br>
+          • <strong>Freezing & Melting Point = 0 °C:</strong> Pure ice melts at 0 °C; pure liquid water freezes at 0 °C. Both states coexist at 0 °C.<br>
+          • <strong>Boiling Point = 100 °C:</strong> Water boils at 100 °C, producing steam bubbles. Steam condenses at or below 100 °C.
         </div>
         <div class="info-box" style="border-left-color: #ef4444;" id="mythTip">
           💡 <strong>Teacher Alert:</strong> Real steam is invisible! The white mist you see above boiling water is already tiny liquid droplets condensed in the air!
@@ -423,21 +434,29 @@
         subTitle: "Microscopic Particles & States of Matter",
         langToggle: "切換為中文 (繁體)",
         hudState: "State: ",
-        hudSpeed: "Particle Speed: ",
-        speedLow: "Low (Vibrating)",
-        speedMed: "Medium (Sliding)",
-        speedHigh: "Fast (Rapid Collisions)",
-        iceBtn: "Ice (-10°C)",
-        waterBtn: "Water (25°C)",
-        steamBtn: "Steam (105°C)",
+        hudMotion: "Particle Motion: ",
+        motionVibrate: "Vibrating in fixed positions",
+        motionTransition0: "Melting/Freezing transition",
+        motionSlide: "Sliding and rolling past each other freely",
+        motionBoiling100: "Vigorous boiling! Steam bubbles rising rapidly",
+        motionGas: "Rapid high-speed collisions in all directions",
+        iceBtn: "Ice<br>(-10°C)",
+        meltBtn: "<br>(0°C)",
+        waterBtn: "Water<br>(25°C)",
+        boilBtn: "<br>(100°C)",
+        steamBtn: "Steam<br>(110°C)",
         tab1: "Particle Intel",
         tab2: "Missions (Quiz)",
         solidTitle: "Solid (Ice)",
+        coexist0Title: "0 °C",
         liquidTitle: "Liquid (Water)",
-        gasTitle: "Gas (Steam / Vapour)",
-        solidDesc: "<strong>Particle Arrangement:</strong> Closely packed in an orderly regular pattern. Particles vibrate about fixed positions.",
-        liquidDesc: "<strong>Particle Arrangement:</strong> Closely packed but irregular. Particles have more kinetic energy.",
-        gasDesc: "<strong>Particle Arrangement:</strong> Widely separated in complete disorder. Particles move rapidly at high speed in all directions.",
+        boil100Title: "100 °C",
+        gasTitle: "Gas (Steam)",
+        solidDesc: "<strong>Particle Arrangement:</strong> Closely packed in an orderly regular pattern. Particles vibrate about fixed positions with very strong attractive forces.",
+        coexist0Desc: "<strong>Phase Change at 0 °C (Melting & Freezing):</strong> The melting point and freezing point are the same (0 °C). Solid ice and liquid water coexist.",
+        liquidDesc: "<strong>Particle Arrangement:</strong> Closely packed but irregular. Particles have sufficient energy to slide and roll past one another freely.",
+        boil100Desc: "<strong>Phase Change at 100 °C (Boiling Point):</strong> Water boils. Bubbles of steam gas form and rise. Energetic particles escape from the liquid surface into gas.",
+        gasDesc: "<strong>Particle Arrangement:</strong> Widely separated in complete disorder. Particles have high kinetic energy and move rapidly in all directions at high speed.",
         restartBtn: "🔄 Restart",
         scoreLabel: "Score: ",
         nextBtn: "Next Question ➔",
@@ -448,25 +467,33 @@
         subTitle: "微觀粒子運動與物態變化互動課堂",
         langToggle: "Switch to English",
         hudState: "目前狀態：",
-        hudSpeed: "粒子運動速率：",
-        speedLow: "低（微弱振動）",
-        speedMed: "中等（自由滑動）",
-        speedHigh: "高速（劇烈碰撞衝馳）",
-        iceBtn: "冰 (-10°C)",
-        waterBtn: "水 (25°C)",
-        steamBtn: "水蒸氣 (105°C)",
+        hudMotion: "粒子運動狀態：",
+        motionVibrate: "在固定位置上微弱振動",
+        motionTransition0: "熔化／凝固相變中（晶格部分崩解自由流動）",
+        motionSlide: "在相鄰粒子間自由流動滑移",
+        motionBoiling100: "沸騰！水蒸氣氣泡大量湧現",
+        motionGas: "向所有方向高速疾馳碰撞",
+        iceBtn: "冰<br>(-10°C)",
+        meltBtn: "<br>0°C",
+        waterBtn: "水<br>(25°C)",
+        boilBtn: "<br>100°C",
+        steamBtn: "水蒸氣<br>(110°C)",
         tab1: "微觀粒子解析",
         tab2: "闖關任務 (問答)",
         solidTitle: "固態（冰）",
+        coexist0Title: "熔點／凝固點（0 °C 冰水相變共存）",
         liquidTitle: "液態（水）",
-        gasTitle: "氣態（水蒸氣 / 水汽）",
-        solidDesc: "<strong>粒子排列特點：</strong> 粒子緊密且有規則地排列構。粒子僅在固定位置上微微振動。",
-        liquidDesc: "<strong>粒子排列特點：</strong> 粒子緊密但排列無序。吸收熱能後，粒子可自由移動。",
-        gasDesc: "<strong>粒子排列特點：</strong> 粒子相距甚遠。具有極高動能，向各個方向高速疾馳碰撞。",
+        boil100Title: "沸點（100 °C 沸騰）",
+        gasTitle: "氣態（水蒸氣）",
+        solidDesc: "<strong>粒子排列特點：</strong> 粒子緊密且有規則地排列成晶格結構。粒子僅在固定位置上微微振動，相互引力極強。",
+        coexist0Desc: "<strong>0 °C 相變特點（熔化與凝固臨界點）：</strong> 水的熔點與凝固點完全相同（均為 0 °C）。冰與水在此溫度共存。粒子吸收熱能克服部分引力，使固定晶格解體並開始滑移流動。",
+        liquidDesc: "<strong>粒子排列特點：</strong> 粒子緊密但排列無序。吸收熱能後，粒子可在相鄰粒子間自由流動滑移。",
+        boil100Desc: "<strong>100 °C 沸點）：</strong> 液體內部全體汽化，產生大量高溫水蒸氣氣泡並迅速上升。高能粒子脫離液面進入氣態。",
+        gasDesc: "<strong>粒子排列特點：</strong> 粒子相距甚遠，完全混亂分散。具有極高動能，向各個方向高速疾馳碰撞。",
         restartBtn: "🔄 重新測驗",
         scoreLabel: "得分：",
         nextBtn: "下一題 ➔",
-        teacherTip: "💡 <strong>老師提點：</strong> 水蒸氣本身是完全無色隱形的氣體！肉眼看見的水煲白煙是遇冷凝結而成的微細液態小水點！",
+        teacherTip: "💡 <strong>老師提點：</strong> 水蒸氣本身是完全無色隱形的氣體！肉眼看見的水煲白煙是遇冷凝結而成的微細液態小水滴！",
       }
     };
 
@@ -474,99 +501,99 @@
     const quizData = {
       en: [
         {
-          q: "1. What is inside the bubbles in boiling water?",
+          q: "1. For pure water, what are its melting point and freezing point?",
           options: [
-            "Trapped air",
-            "Steam (water gas)",
-            "Pure oxygen gas",
-            "Hydrogen gas"
+            "Melting point is 1 °C, freezing point is -1 °C",
+            "Both melting point and freezing point are 0 °C",
+            "Melting point is 0 °C, freezing point is 100 °C",
+            "Water does not have a fixed melting point"
           ],
           ans: 1,
-          expl: "Correct! The bubbles are formed inside the liquid as it boils, and they contain 100% steam (gaseous water), NOT air."
+          expl: "Correct! The melting point and freezing point of pure water are the exact same temperature: 0 °C."
         },
         {
-          q: "2. When water freezes into ice at 0 °C, how do the particles change?",
+          q: "2. What happens to water particles at its boiling point (100 °C)?",
           options: [
-            "Particles shrink into smaller sizes",
-            "Particles stop moving completely forever",
-            "Particles form a regular lattice and vibrate in fixed positions",
-            "Particles disappear"
+            "Particles turn into air particles",
+            "Water particles gain enough energy to form steam bubbles",
+            "Particles freeze into crystal lattices",
+            "Particles shrink in size"
           ],
-          ans: 2,
-          expl: "Correct! Particles do not change size; they arrange into an orderly pattern and vibrate about fixed spots."
+          ans: 1,
+          expl: "Correct! At 100 °C, water boils, forming steam bubbles."
         },
         {
           q: "3. What is the visible 'white mist' seen above a boiling kettle?",
           options: [
-            "Steam gas",
+            "Pure steam gas",
             "Tiny liquid water droplets condensed in cooler air",
-            "Hot smoke particles",
-            "Boiled air"
+            "Hot smoke from the stove",
+            "Oxygen gas"
           ],
           ans: 1,
-          expl: "Correct! Steam is completely invisible. The white mist consists of tiny liquid droplets formed when steam cools down."
+          expl: "Correct! Pure steam is completely invisible. The white mist consists of tiny liquid droplets formed when steam cools down."
         },
         {
-          q: "4. Why do water droplets appear on the outside of a cold cup?",
+          q: "4. Why do water droplets appear on the outside of a cold glass of iced water?",
           options: [
-            "Water leaked through tiny holes in the glass",
-            "Coldness escaped from inside",
-            "Water vapour in the surrounding air cooled down and condensed on the cold glass",
-            "The ice inside melted and overflowed"
+            "Water leaked through the glass",
+            "Coldness turned into water",
+            "Water vapour in the surrounding air cooled down and condensed on the cold glass surface",
+            "Ice cubes inside the glass overflowed"
           ],
           ans: 2,
-          expl: "Correct! Warm water vapour in surrounding room air loses heat to the cold surface and condenses into droplets."
+          expl: "Correct! Gaseous water vapour in the surrounding room air touches the cold glass, loses heat, and condenses into liquid water."
         }
       ],
       zh: [
         {
-          q: "1. 沸騰的水中不斷上升的大氣泡，裏面裝着甚麼氣體？",
+          q: "1. 對於純水而言，其「熔點」與「凝固點」數值分別是多少？",
           options: [
-            "困在水中的空氣",
-            "水蒸氣（氣態水）",
-            "純氧氣",
-            "氫氣"
+            "熔點是 1 °C，凝固點是 -1 °C",
+            "熔點與凝固點完全相同，皆為 0 °C",
+            "熔點是 0 °C，凝固點是 100 °C",
+            "純水沒有固定的熔點"
           ],
           ans: 1,
-          expl: "答對了！氣泡是在液體內部劇烈汽化產生的，裏面完全是高溫「水蒸氣」，絕非空氣或氧氣。"
+          expl: "答對了！在標準大氣壓下，純水的熔點和凝固點是完全相同的溫度，均為 0 °C。"
         },
         {
-          q: "2. 當水在 0 °C 凝固成冰時，微觀粒子發生了甚麼變化？",
+          q: "2. 當水到達沸點（100 °C）時，微觀粒子發生了甚麼現象？",
           options: [
-            "粒子本身體積縮小了",
-            "粒子完全靜止不再動",
-            "粒子排列成規則的晶格結構，並在固定位置上振動",
-            "粒子數量減少了"
+            "粒子變成了空氣粒子",
+            "液體沸騰，粒子獲得極大動能形成上升的水蒸氣氣泡並脫離液面",
+            "粒子排列成規則的六角晶格",
+            "粒子本身的體積縮小"
           ],
-          ans: 2,
-          expl: "答對了！粒子本身大小不變，而是由自由流動變為規則排列，僅在固定位置作微弱振動。"
+          ans: 1,
+          expl: "答對了！在 100 °C 時，液體沸騰，內部汽化形成 100% 水蒸氣氣泡。"
         },
         {
           q: "3. 水煲煮沸時，壺口上方看見的「白霧／白煙」本質是甚麼？",
           options: [
-            "真正純淨的水蒸氣",
+            "真正純淨的水蒸氣氣體",
             "水蒸氣遇冷空氣凝結成的大量微小液態水滴",
-            "熱水產生的燃燒煙霧",
-            "受熱膨脹的熱空氣"
+            "水受熱產生的燃燒煙霧",
+            "釋放出來的氧氣"
           ],
           ans: 1,
-          expl: "答對了！水蒸氣是無色透明的。肉眼可見的白霧實際上是水蒸氣遇冷凝結懸浮於空中的「小水滴」。"
+          expl: "答對了！水蒸氣本身是無色隱形的氣體。看見的白霧是水蒸氣遇冷空氣凝結懸浮的小水滴。"
         },
         {
-          q: "4. 將凍飲置於室溫中，杯子外壁凝結的小水珠從何而來？",
+          q: "4. 將一杯凍水置於室溫中，杯子外壁凝結的小水珠從何而來？",
           options: [
-            "杯內的水從玻璃微孔滲透出來",
-            "杯內的冷氣穿透出來化成水",
+            "杯內的水從玻璃毛孔滲透出來",
+            "杯子釋放的「冷氣」變成了水",
             "周圍空氣中的水蒸氣碰到冰冷杯壁，散熱凝結成液態水滴",
-            "杯口融化的冰水滿溢出來"
+            "杯內融化的冰水滿溢出來"
           ],
           ans: 2,
-          expl: "答對了！空氣中含有水蒸氣，接觸低溫杯壁時降溫並發生「凝結」，形成晶瑩的小水滴。"
+          expl: "答對了！空氣中含有水蒸氣，接觸冰冷杯壁時散熱降溫並「凝結」成小水珠。"
         }
       ]
     };
 
-    // --- CANVAS PARTICLE SIMULATION SYSTEM ---
+    // --- CANVAS SIMULATION ENGINE ---
     const canvas = document.getElementById("particleCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -582,88 +609,115 @@
         this.y = 0;
         this.vx = (Math.random() - 0.5) * 2;
         this.vy = (Math.random() - 0.5) * 2;
-        this.targetX = 0;
-        this.targetY = 0;
+        // Lattice target coordinates for solid state
+        const cols = 8;
+        const spacingX = 40;
+        const spacingY = 32;
+        const startX = (canvas.width - cols * spacingX) / 2 + 20;
+        const startY = canvas.height - 180;
+        const row = Math.floor(id / cols);
+        const col = id % cols;
+        this.latticeX = startX + col * spacingX + (row % 2) * 18;
+        this.latticeY = startY + row * spacingY;
       }
 
       update(temp) {
-        if (temp <= 0) {
-          // SOLID STATE: Fixed lattice with jitter
-          const cols = 8;
-          const spacingX = 40;
-          const spacingY = 34;
-          const startX = (canvas.width - cols * spacingX) / 2 + 20;
-          const startY = canvas.height - 180;
-
-          const row = Math.floor(this.id / cols);
-          const col = this.id % cols;
-
-          const baseX = startX + col * spacingX + (row % 2) * 18;
-          const baseY = startY + row * spacingY;
-
-          // Jitter proportional to temp above -50
-          const jitterAmount = Math.max(0.4, (temp + 25) * 0.08);
-          this.x = baseX + (Math.random() - 0.5) * jitterAmount;
-          this.y = baseY + (Math.random() - 0.5) * jitterAmount;
-        } 
-        else if (temp > 0 && temp < 100) {
-          // LIQUID STATE: Slipping, sliding at bottom
-          const speedMultiplier = 0.8 + (temp / 100) * 1.5;
-          this.x += this.vx * speedMultiplier;
-          this.y += this.vy * speedMultiplier;
-
-          // Gravity bias keeping them towards lower half
-          this.vy += 0.08;
-
-          // Boundaries
-          const bottom = canvas.height - PARTICLE_RADIUS - 5;
-          const topLiquid = canvas.height - 210;
-
-          if (this.y > bottom) { this.y = bottom; this.vy *= -0.7; }
-          if (this.y < topLiquid) { this.y = topLiquid; this.vy *= -0.7; }
-          if (this.x < PARTICLE_RADIUS + 5) { this.x = PARTICLE_RADIUS + 5; this.vx *= -0.8; }
-          if (this.x > canvas.width - PARTICLE_RADIUS - 5) { this.x = canvas.width - PARTICLE_RADIUS - 5; this.vx *= -0.8; }
-        } 
-        else {
-          // GAS STATE: Fast moving, bounces off all walls
-          const gasSpeed = 3.2 + ((temp - 100) / 20) * 2.2;
-          this.x += this.vx * gasSpeed;
-          this.y += this.vy * gasSpeed;
-
-          // Bounce all boundaries
-          if (this.x <= PARTICLE_RADIUS + 2 || this.x >= canvas.width - PARTICLE_RADIUS - 2) {
-            this.vx *= -1;
-          }
-          if (this.y <= PARTICLE_RADIUS + 2 || this.y >= canvas.height - PARTICLE_RADIUS - 2) {
-            this.vy *= -1;
+        if (temp < 0) {
+          // 1. SOLID STATE (T < 0 °C): Fixed lattice positions with jitter
+          const jitter = Math.max(0.4, (temp + 25) * 0.08);
+          this.x = this.latticeX + (Math.random() - 0.5) * jitter;
+          this.y = this.latticeY + (Math.random() - 0.5) * jitter;
+        }
+        else if (temp === 0) {
+          // 2. MELTING & FREEZING EQUILIBRIUM (T = 0 °C):
+          // Coexistence state: half in lattice, half sliding
+          if (this.id % 2 === 0) {
+            const jitter = 1.2;
+            this.x = this.latticeX + (Math.random() - 0.5) * jitter;
+            this.y = this.latticeY + (Math.random() - 0.5) * jitter;
+          } else {
+            this.x += this.vx * 0.9;
+            this.y += this.vy * 0.9;
+            this.vy += 0.08;
+            this.constrainLiquid();
           }
         }
+        else if (temp > 0 && temp < 100) {
+          // 3. LIQUID STATE (0 °C < T < 100 °C):
+          // Slipping freely along bottom
+          const speedMultiplier = 0.8 + (temp / 100) * 1.6;
+          this.x += this.vx * speedMultiplier;
+          this.y += this.vy * speedMultiplier;
+          this.vy += 0.09;
+          this.constrainLiquid();
+        }
+        else if (temp === 100) {
+          // 4. BOILING POINT (T = 100 °C):
+          // Vigorous phase transition with steam bubbles & escaping particles
+          if (this.id % 3 === 0) {
+            this.x += this.vx * 3.5;
+            this.y += this.vy * 3.5;
+            this.constrainGas();
+          } else {
+            this.x += this.vx * 2.2;
+            this.y += this.vy * 2.2;
+            this.vy += 0.07;
+            this.constrainLiquid();
+          }
+        }
+        else {
+          // 5. GAS STATE (T > 100 °C):
+          // High-speed random motion filling entire container
+          const gasSpeed = 3.6 + ((temp - 100) / 20) * 2.0;
+          this.x += this.vx * gasSpeed;
+          this.y += this.vy * gasSpeed;
+          this.constrainGas();
+        }
+      }
+
+      constrainLiquid() {
+        const bottom = canvas.height - PARTICLE_RADIUS - 6;
+        const topLiquid = canvas.height - 210;
+
+        if (this.y > bottom) { this.y = bottom; this.vy *= -0.75; }
+        if (this.y < topLiquid) { this.y = topLiquid; this.vy *= -0.75; }
+        if (this.x < PARTICLE_RADIUS + 6) { this.x = PARTICLE_RADIUS + 6; this.vx *= -0.85; }
+        if (this.x > canvas.width - PARTICLE_RADIUS - 6) { this.x = canvas.width - PARTICLE_RADIUS - 6; this.vx *= -0.85; }
+      }
+
+      constrainGas() {
+        const pad = PARTICLE_RADIUS + 4;
+        if (this.x <= pad) { this.x = pad; this.vx *= -1; }
+        if (this.x >= canvas.width - pad) { this.x = canvas.width - pad; this.vx *= -1; }
+        if (this.y <= pad) { this.y = pad; this.vy *= -1; }
+        if (this.y >= canvas.height - pad) { this.y = canvas.height - pad; this.vy *= -1; }
       }
 
       draw() {
         ctx.beginPath();
         ctx.arc(this.x, this.y, PARTICLE_RADIUS, 0, Math.PI * 2);
 
-        // Color coding depending on state
-        if (temperature <= 0) {
-          // Ice: icy cyan
+        if (temperature < 0) {
           ctx.fillStyle = "#7dd3fc";
-          ctx.strokeStyle = "#38bdf8";
+          ctx.strokeStyle = "#0284c7";
+        } else if (temperature === 0) {
+          ctx.fillStyle = this.id % 2 === 0 ? "#7dd3fc" : "#38bdf8";
+          ctx.strokeStyle = "#0369a1";
         } else if (temperature < 100) {
-          // Liquid: deep azure
           ctx.fillStyle = "#38bdf8";
           ctx.strokeStyle = "#0284c7";
+        } else if (temperature === 100) {
+          ctx.fillStyle = this.id % 3 === 0 ? "#fb923c" : "#38bdf8";
+          ctx.strokeStyle = "#ea580c";
         } else {
-          // Gas: energetic steam orange-pink
-          ctx.fillStyle = "#fda4af";
-          ctx.strokeStyle = "#f43f5e";
+          ctx.fillStyle = "#f87171";
+          ctx.strokeStyle = "#dc2626";
         }
 
         ctx.lineWidth = 2;
         ctx.fill();
         ctx.stroke();
 
-        // Shiny reflection dot
         ctx.beginPath();
         ctx.arc(this.x - 3, this.y - 3, 2.5, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(255,255,255,0.7)";
@@ -679,24 +733,26 @@
     function animate() {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw container outline
-      ctx.strokeStyle = "rgba(255,255,255,0.25)";
+      // Container boundary
+      ctx.strokeStyle = "rgba(255,255,255,0.2)";
       ctx.lineWidth = 4;
       ctx.strokeRect(4, 4, canvas.width - 8, canvas.height - 8);
 
-      // If boiling, draw bubbles rising
+      // Steam bubbles animation at 100 °C or above
       if (temperature >= 100) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.15)";
-        for (let b = 0; b < 6; b++) {
-          const bx = 40 + (b * 75) + Math.sin(Date.now() * 0.005 + b) * 15;
-          const by = (canvas.height - ((Date.now() * 0.15 + b * 60) % canvas.height));
+        ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+        for (let b = 0; b < 7; b++) {
+          const bx = 35 + (b * 68) + Math.sin(Date.now() * 0.007 + b) * 14;
+          const by = (canvas.height - ((Date.now() * 0.18 + b * 55) % (canvas.height - 80)));
           ctx.beginPath();
-          ctx.arc(bx, by, 12, 0, Math.PI * 2);
+          ctx.arc(bx, by, 10 + (b % 4), 0, Math.PI * 2);
           ctx.fill();
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
         }
       }
 
-      // Update and draw particles
       particles.forEach(p => {
         p.update(temperature);
         p.draw();
@@ -706,11 +762,18 @@
     }
     animate();
 
-    // --- INTERACTIVE UI LOGIC ---
+    // --- INTERACTIVE UI UPDATE LOGIC ---
     function updateTemperature(val) {
       temperature = parseInt(val, 10);
       document.getElementById("tempText").innerText = `${temperature} °C`;
       document.getElementById("tempSlider").value = temperature;
+
+      document.querySelectorAll(".quick-btn").forEach(b => b.classList.remove("active-preset"));
+      if (temperature === -10) document.getElementById("pbtn-ice").classList.add("active-preset");
+      else if (temperature === 0) document.getElementById("pbtn-melt").classList.add("active-preset");
+      else if (temperature === 25) document.getElementById("pbtn-water").classList.add("active-preset");
+      else if (temperature === 100) document.getElementById("pbtn-boil").classList.add("active-preset");
+      else if (temperature === 110) document.getElementById("pbtn-steam").classList.add("active-preset");
 
       const lang = translations[currentLang];
       const stateEl = document.getElementById("stateName");
@@ -718,25 +781,43 @@
       const badgeEl = document.getElementById("stateBadge");
       const descEl = document.getElementById("particleDesc");
 
-      if (temperature <= 0) {
+      if (temperature < 0) {
         stateEl.innerText = lang.solidTitle;
         stateEl.style.color = "#7dd3fc";
-        speedEl.innerText = lang.speedLow;
-        speedEl.style.color = "#38bdf8";
+        speedEl.innerText = lang.motionVibrate;
+        speedEl.style.color = "#7dd3fc";
         badgeEl.innerText = `${lang.hudState} ${lang.solidTitle}`;
         descEl.innerHTML = lang.solidDesc;
-      } else if (temperature < 100) {
+      } 
+      else if (temperature === 0) {
+        stateEl.innerText = lang.coexist0Title;
+        stateEl.style.color = "#38bdf8";
+        speedEl.innerText = lang.motionTransition0;
+        speedEl.style.color = "#38bdf8";
+        badgeEl.innerText = `${lang.hudState} ${lang.coexist0Title}`;
+        descEl.innerHTML = lang.coexist0Desc;
+      } 
+      else if (temperature > 0 && temperature < 100) {
         stateEl.innerText = lang.liquidTitle;
         stateEl.style.color = "#38bdf8";
-        speedEl.innerText = lang.speedMed;
+        speedEl.innerText = lang.motionSlide;
         speedEl.style.color = "#22c55e";
         badgeEl.innerText = `${lang.hudState} ${lang.liquidTitle}`;
         descEl.innerHTML = lang.liquidDesc;
-      } else {
+      } 
+      else if (temperature === 100) {
+        stateEl.innerText = lang.boil100Title;
+        stateEl.style.color = "#fb923c";
+        speedEl.innerText = lang.motionBoiling100;
+        speedEl.style.color = "#fb923c";
+        badgeEl.innerText = `${lang.hudState} ${lang.boil100Title}`;
+        descEl.innerHTML = lang.boil100Desc;
+      } 
+      else {
         stateEl.innerText = lang.gasTitle;
-        stateEl.style.color = "#fb7185";
-        speedEl.innerText = lang.speedHigh;
-        speedEl.style.color = "#f43f5e";
+        stateEl.style.color = "#f87171";
+        speedEl.innerText = lang.motionGas;
+        speedEl.style.color = "#f87171";
         badgeEl.innerText = `${lang.hudState} ${lang.gasTitle}`;
         descEl.innerHTML = lang.gasDesc;
       }
@@ -849,10 +930,12 @@
 
       document.getElementById("langBtn").innerText = t.langToggle;
       document.getElementById("hudStateLabel").innerText = t.hudState;
-      document.getElementById("hudSpeedLabel").innerText = t.hudSpeed;
-      document.querySelector(".txt-ice").innerText = t.iceBtn;
-      document.querySelector(".txt-water").innerText = t.waterBtn;
-      document.querySelector(".txt-steam").innerText = t.steamBtn;
+      document.getElementById("hudSpeedLabel").innerText = t.hudMotion;
+      document.querySelector(".txt-ice").innerHTML = t.iceBtn;
+      document.querySelector(".txt-melt").innerHTML = t.meltBtn;
+      document.querySelector(".txt-water").innerHTML = t.waterBtn;
+      document.querySelector(".txt-boil").innerHTML = t.boilBtn;
+      document.querySelector(".txt-steam").innerHTML = t.steamBtn;
       document.getElementById("tab1Title").innerText = t.tab1;
       document.getElementById("tab2Title").innerText = t.tab2;
       document.getElementById("restartBtn").innerText = t.restartBtn;
@@ -868,3 +951,4 @@
   </script>
 </body>
 </html>
+```
